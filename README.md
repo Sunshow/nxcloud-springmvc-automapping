@@ -52,7 +52,7 @@ public class GetUserUseCase {
 可自动为此 UseCase 注册如下 RequestMapping：
 
 ```java
-@RequestMapping(value = "/api/user/getUserUseCase", method = RequestMethod.POST)
+@RequestMapping(value = "/api/user/getUser", method = RequestMethod.POST)
 @ResponseBody
-GetUserUseCase.Output getUserUseCase(@RequestBody GetUserUseCase.Input input);
+GetUserUseCase.Output getUser(@RequestBody GetUserUseCase.Input input);
 ```
