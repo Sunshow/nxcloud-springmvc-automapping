@@ -20,14 +20,34 @@ class ContractAutoMappingRequestHandler : AutoMappingRequestHandler {
         return listOf(
             RequestHandlerInfo(
                 RequestMappingInfo
-                    .paths("/auto")
+                    .paths("/rename")
                     .consumes(MediaType.APPLICATION_JSON_VALUE)
                     .methods(RequestMethod.POST)
                     .options(options)
                     .build(),
                 bean,
-                bean.javaClass.getMethod("getUserBody")
-            )
+                bean.javaClass.getMethod("rename", User::class.java)
+            ),
+            RequestHandlerInfo(
+                RequestMappingInfo
+                    .paths("/info")
+                    .consumes(MediaType.APPLICATION_JSON_VALUE)
+                    .methods(RequestMethod.POST)
+                    .options(options)
+                    .build(),
+                bean,
+                bean.javaClass.getMethod("info")
+            ),
+            RequestHandlerInfo(
+                RequestMappingInfo
+                    .paths("/submit")
+                    .consumes(MediaType.APPLICATION_JSON_VALUE)
+                    .methods(RequestMethod.POST)
+                    .options(options)
+                    .build(),
+                bean,
+                bean.javaClass.getMethod("submit", User::class.java)
+            ),
         )
     }
 

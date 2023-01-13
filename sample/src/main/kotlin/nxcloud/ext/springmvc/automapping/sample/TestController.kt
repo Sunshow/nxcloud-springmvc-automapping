@@ -11,4 +11,9 @@ class TestController {
         return "Hello World"
     }
 
+    @RequestMapping("/void")
+    fun testVoid() {
+        println("testVoid")
+    }
+
 }
