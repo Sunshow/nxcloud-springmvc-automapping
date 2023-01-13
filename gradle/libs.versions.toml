@@ -1,6 +1,6 @@
 [versions]
 org-jetbrains-kotlin = "1.7.10"
-org-springframework = { prefer = "5.3.23" }
+org-springframework = { prefer = "5.3.24" }
 org-springframework-boot = "2.7.7"
 com-vanniktech-gradle-maven-publish = "0.22.0"
 org-slf4j = { prefer = "1.7.36" }
@@ -13,6 +13,7 @@ slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "org-slf4j" }
 javax-jaxb = { module = "javax.xml.bind:jaxb-api", version = "2.3.1" }
 bom-springboot = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "org-springframework-boot" }
 spring-context = { module = "org.springframework:spring-context", version.ref = "org-springframework" }
+spring-mvc = { module = "org.springframework:spring-webmvc", version.ref = "org-springframework" }
 springboot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "org-springframework-boot" }
 springboot-test = { module = "org.springframework.boot:spring-boot-test", version.ref = "org-springframework-boot" }
 springboot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "org-springframework-boot" }

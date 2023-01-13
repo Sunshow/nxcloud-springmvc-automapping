@@ -1,10 +1,10 @@
 package nxcloud.ext.springmvc.automapping.sample
 
-import nxcloud.ext.springmvc.automapping.annotation.EnableSpringMvcAutoMapping
+import nxcloud.ext.springmvc.automapping.annotation.NXEnableSpringMvcAutoMapping
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
-@EnableSpringMvcAutoMapping
+@NXEnableSpringMvcAutoMapping(autoMappingBeanTypes = [UserContract::class])
 @SpringBootApplication
 class AutoMappingSampleApp
 
