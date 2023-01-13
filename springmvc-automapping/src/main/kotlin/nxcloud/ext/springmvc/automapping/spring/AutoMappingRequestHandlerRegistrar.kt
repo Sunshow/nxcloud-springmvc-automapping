@@ -2,7 +2,7 @@ package nxcloud.ext.springmvc.automapping.spring
 
 import mu.KotlinLogging
 import nxcloud.ext.springmvc.automapping.context.AutoMappingContext
-import nxcloud.ext.springmvc.automapping.handler.AutoMappingBeanHandler
+import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestHandler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.BeanPostProcessor
 import org.springframework.context.ApplicationContext
@@ -10,7 +10,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import javax.annotation.PostConstruct
 
 
-class SpringMvcAutoMappingBeanPostProcessor : BeanPostProcessor {
+class AutoMappingRequestHandlerRegistrar : BeanPostProcessor {
 
     private val logger = KotlinLogging.logger {}
 
@@ -20,12 +20,12 @@ class SpringMvcAutoMappingBeanPostProcessor : BeanPostProcessor {
     @Autowired
     private lateinit var applicationContext: ApplicationContext
 
-    private val autoMappingBeanHandlers: MutableList<AutoMappingBeanHandler> = mutableListOf()
+    private val autoMappingRequestHandlers: MutableList<AutoMappingRequestHandler> = mutableListOf()
 
     @PostConstruct
     private fun init() {
-        autoMappingBeanHandlers.addAll(
-            applicationContext.getBeansOfType(AutoMappingBeanHandler::class.java).values
+        autoMappingRequestHandlers.addAll(
+            applicationContext.getBeansOfType(AutoMappingRequestHandler::class.java).values
         )
     }
 
@@ -39,14 +39,14 @@ class SpringMvcAutoMappingBeanPostProcessor : BeanPostProcessor {
 
         val handlerMapping = applicationContext.getBean(RequestMappingHandlerMapping::class.java)
 
-        autoMappingBeanHandlers.forEach {
-            it.mapping(bean, beanName).forEach { mapping ->
-                // TODO DELETE ME
-                handlerMapping.registerMapping(mapping, bean, bean.javaClass.methods[0])
+        autoMappingRequestHandlers.forEach {
+            it.mapping(bean, beanName).forEach { info ->
+                // 逐个注册
+                handlerMapping.registerMapping(info.mapping, info.bean, info.method)
             }
         }
 
         return bean
     }
-    
+
 }

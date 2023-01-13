@@ -9,7 +9,7 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar
 import org.springframework.core.type.AnnotationMetadata
 import org.springframework.util.ClassUtils
 
-class SpringMvcAutoMappingRegistrar : ImportBeanDefinitionRegistrar {
+class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar {
 
     private val logger = KotlinLogging.logger {}
 
@@ -45,19 +45,19 @@ class SpringMvcAutoMappingRegistrar : ImportBeanDefinitionRegistrar {
         )
 
         registry.registerBeanDefinition(
-            "nxSpringMvcAutoMappingBeanPostProcessor",
+            "nxAutoMappingRequestHandlerRegistrar",
             BeanDefinitionBuilder
                 .genericBeanDefinition(
-                    SpringMvcAutoMappingBeanPostProcessor::class.java
+                    AutoMappingRequestHandlerRegistrar::class.java
                 )
                 .beanDefinition
         )
 
         registry.registerBeanDefinition(
-            "nxSpringMvcAutoMappingReturnValueConfigurer",
+            "nxAutoMappingReturnValueWebMvcConfigurer",
             BeanDefinitionBuilder
                 .genericBeanDefinition(
-                    SpringMvcAutoMappingReturnValueConfigurer::class.java
+                    AutoMappingReturnValueWebMvcConfigurer::class.java
                 )
                 .beanDefinition
         )

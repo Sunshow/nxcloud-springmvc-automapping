@@ -1,6 +1,6 @@
 package nxcloud.ext.springmvc.automapping.annotation
 
-import nxcloud.ext.springmvc.automapping.spring.SpringMvcAutoMappingRegistrar
+import nxcloud.ext.springmvc.automapping.spring.AutoMappingBeanDefinitionRegistrar
 import org.springframework.context.annotation.Import
 import java.lang.annotation.*
 import kotlin.reflect.KClass
@@ -11,7 +11,7 @@ import kotlin.reflect.KClass
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 @MustBeDocumented
-@Import(SpringMvcAutoMappingRegistrar::class)
+@Import(AutoMappingBeanDefinitionRegistrar::class)
 annotation class NXEnableSpringMvcAutoMapping(
     // 自动映射扫描的包路径
     val basePackages: Array<String> = [],

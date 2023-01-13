@@ -6,7 +6,7 @@ import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor
 
 
-class SpringMvcAutoMappingRequestResponseBodyMethodProcessor(
+class AutoMappingRequestResponseBodyMethodProcessor(
     private val autoMappingContext: AutoMappingContext,
     converters: List<HttpMessageConverter<*>>
 ) : RequestResponseBodyMethodProcessor(converters) {

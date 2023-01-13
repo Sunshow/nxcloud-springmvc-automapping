@@ -7,7 +7,7 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 
-class SpringMvcAutoMappingReturnValueConfigurer : WebMvcConfigurer {
+class AutoMappingReturnValueWebMvcConfigurer : WebMvcConfigurer {
 
     @Autowired
     private lateinit var autoMappingContext: AutoMappingContext
@@ -17,7 +17,7 @@ class SpringMvcAutoMappingReturnValueConfigurer : WebMvcConfigurer {
 
     override fun addReturnValueHandlers(handlers: MutableList<HandlerMethodReturnValueHandler>) {
         handlers.add(
-            SpringMvcAutoMappingRequestResponseBodyMethodProcessor(
+            AutoMappingRequestResponseBodyMethodProcessor(
                 autoMappingContext,
                 converters
             )
