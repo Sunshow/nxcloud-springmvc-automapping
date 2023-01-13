@@ -7,6 +7,8 @@ org-slf4j = { prefer = "1.7.36" }
 kotlin-logging-jvm = "2.1.23"
 ch-qos-logback = { prefer = "1.4.4" }
 io-spring-dependency-management = "1.1.0"
+nxcloud-foundation-core = "0.2.8"
+jakarta-annotation = "1.3.5"
 
 [libraries]
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "org-slf4j" }
@@ -21,6 +23,8 @@ springboot-starter-logging = { module = "org.springframework.boot:spring-boot-st
 springboot-starter-aop = { module = "org.springframework.boot:spring-boot-starter-aop", version.ref = "org-springframework-boot" }
 kotlin-logging-jvm = { module = "io.github.microutils:kotlin-logging-jvm", version.ref = "kotlin-logging-jvm" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback" }
+nxcloud-core-spring-boot-starter = { module = "nxcloud.foundation:nxcloud-core-spring-boot-starter", version.ref = "nxcloud-foundation-core" }
+jakarta-annotation-api = { module = "jakarta.annotation:jakarta.annotation-api", version.ref = "jakarta-annotation" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin" }

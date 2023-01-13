@@ -1,5 +1,6 @@
 package nxcloud.ext.springmvc.automapping.annotation
 
+import nxcloud.ext.springmvc.automapping.spring.SpringMvcAutoMappingRegistrar
 import org.springframework.context.annotation.Import
 import java.lang.annotation.*
 import kotlin.reflect.KClass

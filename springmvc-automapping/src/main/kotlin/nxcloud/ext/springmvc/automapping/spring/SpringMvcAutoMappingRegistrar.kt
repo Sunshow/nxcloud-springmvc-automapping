@@ -1,6 +1,7 @@
-package nxcloud.ext.springmvc.automapping.annotation
+package nxcloud.ext.springmvc.automapping.spring
 
 import mu.KotlinLogging
+import nxcloud.ext.springmvc.automapping.annotation.NXEnableSpringMvcAutoMapping
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar
