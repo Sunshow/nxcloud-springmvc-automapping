@@ -2,6 +2,7 @@ package nxcloud.ext.springmvc.automapping.spring
 
 import mu.KotlinLogging
 import nxcloud.ext.springmvc.automapping.annotation.NXEnableSpringMvcAutoMapping
+import nxcloud.ext.springmvc.automapping.context.AutoMappingContext
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar
@@ -11,6 +12,8 @@ import org.springframework.util.ClassUtils
 class SpringMvcAutoMappingRegistrar : ImportBeanDefinitionRegistrar {
 
     private val logger = KotlinLogging.logger {}
+
+    private val contextBeanName = "nxAutoMappingContext"
 
     override fun registerBeanDefinitions(importingClassMetadata: AnnotationMetadata, registry: BeanDefinitionRegistry) {
         super.registerBeanDefinitions(importingClassMetadata, registry)
@@ -28,32 +31,36 @@ class SpringMvcAutoMappingRegistrar : ImportBeanDefinitionRegistrar {
             "自动映射扫描包路径: ${basePackages.joinToString(", ")}"
         }
 
-        val postProcessorBuilder = BeanDefinitionBuilder.genericBeanDefinition(
-            SpringMvcAutoMappingBeanPostProcessor::class.java
+        // 注册 Context
+        registry.registerBeanDefinition(
+            contextBeanName,
+            BeanDefinitionBuilder
+                .genericBeanDefinition(
+                    AutoMappingContext::class.java
+                )
+                .addConstructorArgValue(basePackages)
+                .addConstructorArgValue(attributes["autoMappingAnnotations"])
+                .addConstructorArgValue(attributes["autoMappingBeanTypes"])
+                .beanDefinition
         )
-        postProcessorBuilder.addConstructorArgValue(basePackages)
-        postProcessorBuilder.addConstructorArgValue(attributes["autoMappingBeanTypes"])
-        registry.registerBeanDefinition("nxSpringMvcAutoMappingBeanPostProcessor", postProcessorBuilder.beanDefinition)
 
+        registry.registerBeanDefinition(
+            "nxSpringMvcAutoMappingBeanPostProcessor",
+            BeanDefinitionBuilder
+                .genericBeanDefinition(
+                    SpringMvcAutoMappingBeanPostProcessor::class.java
+                )
+                .beanDefinition
+        )
 
-//        //生成BeanDefinition并注册到容器中
-//        val mappingBuilder: BeanDefinitionBuilder = BeanDefinitionBuilder
-//            .genericBeanDefinition(ContractAutoHandlerRegisterHandlerMapping::class.java)
-//        mappingBuilder.addConstructorArgValue(basePackages)
-//        try {
-//            val forName = Class.forName("com.dizang.concise.mvc.config.ConciseMvcRegisterConfig")
-//            if (forName != null) {
-//                mappingBuilder.addDependsOn("conciseMvcRegisterConfig")
-//            }
-//        } catch (e: ClassNotFoundException) {
-//            log.error(e.message, e)
-//        }
-//        registry.registerBeanDefinition("contractAutoHandlerRegisterHandlerMapping", mappingBuilder.beanDefinition)
-//
-//        val processBuilder: BeanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(
-//            ContractReturnValueWebMvcConfigurer::class.java
-//        )
-//        registry.registerBeanDefinition("contractReturnValueWebMvcConfigurer", processBuilder.beanDefinition)
+        registry.registerBeanDefinition(
+            "nxSpringMvcAutoMappingReturnValueConfigurer",
+            BeanDefinitionBuilder
+                .genericBeanDefinition(
+                    SpringMvcAutoMappingReturnValueConfigurer::class.java
+                )
+                .beanDefinition
+        )
 
         logger.info {
             "启用 SpringMvc 自动映射, 处理器注册完成"

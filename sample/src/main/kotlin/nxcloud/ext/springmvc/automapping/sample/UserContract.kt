@@ -3,14 +3,14 @@ package nxcloud.ext.springmvc.automapping.sample
 import org.springframework.stereotype.Component
 
 interface UserContract {
-    fun getUserBody(user: User): User
+    fun getUserBody(): User
 }
 
 @Component
 class UserContractImpl : UserContract {
-    override fun getUserBody(user: User): User {
-        return user.copy(
-            name = "Hello, ${user.name}"
+    override fun getUserBody(): User {
+        return User(
+            name = "Hello"
         )
     }
 }
