@@ -3,11 +3,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-    `java-library`
+    java
     `maven-publish`
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.allopen)
     alias(libs.plugins.kotlin.noarg)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.springboot) apply false
 }
 
 allprojects {
@@ -47,6 +49,12 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "org.jetbrains.kotlin.plugin.allopen")
     apply(plugin = "org.jetbrains.kotlin.plugin.noarg")
+
+    if (project.name == "sample") {
+        apply(plugin = "org.springframework.boot")
+    } else {
+        apply(plugin = "java-library")
+    }
 
     allOpen {
         annotations(
@@ -114,6 +122,10 @@ subprojects {
 }
 
 subprojects {
+    if (project.name == "sample") {
+        return@subprojects
+    }
+
     apply(plugin = "maven-publish")
 
     publishing {
@@ -160,6 +172,24 @@ subprojects {
         }
     }
 
+}
+
+subprojects {
+    if (project.name != "sample") {
+        return@subprojects
+    }
+    apply(plugin = "io.spring.dependency-management")
+
+    dependencyManagement {
+        resolutionStrategy {
+            cacheChangingModulesFor(0, "seconds")
+            cacheDynamicVersionsFor(0, "seconds")
+        }
+
+        imports {
+            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+        }
+    }
 }
 
 tasks.wrapper {

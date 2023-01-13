@@ -1,6 +1,7 @@
 rootProject.name = "nxcloud-springmvc-automapping"
 include(":springmvc-automapping")
 include(":ext-spring-boot-starter-springmvc-automapping")
+include(":sample")
 
 pluginManagement {
     repositories {
