@@ -1,7 +1,9 @@
 package nxcloud.ext.springmvc.automapping.sample
 
+import nxcloud.ext.springmvc.automapping.annotation.AutoMappingContract
 import org.springframework.stereotype.Component
 
+@AutoMappingContract
 interface UserContract {
 
     fun info(): User
