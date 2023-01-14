@@ -2,7 +2,7 @@ package nxcloud.ext.springmvc.automapping.spring
 
 import mu.KotlinLogging
 import nxcloud.ext.springmvc.automapping.context.AutoMappingContext
-import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestHandler
+import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestResolver
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.BeanPostProcessor
 import org.springframework.context.ApplicationContext
@@ -20,12 +20,12 @@ class AutoMappingRequestHandlerRegistrar : BeanPostProcessor {
     @Autowired
     private lateinit var applicationContext: ApplicationContext
 
-    private val autoMappingRequestHandlers: MutableList<AutoMappingRequestHandler> = mutableListOf()
+    private val autoMappingRequestResolvers: MutableList<AutoMappingRequestResolver> = mutableListOf()
 
     @PostConstruct
     private fun init() {
-        autoMappingRequestHandlers.addAll(
-            applicationContext.getBeansOfType(AutoMappingRequestHandler::class.java).values
+        autoMappingRequestResolvers.addAll(
+            applicationContext.getBeansOfType(AutoMappingRequestResolver::class.java).values
         )
     }
 
@@ -39,7 +39,7 @@ class AutoMappingRequestHandlerRegistrar : BeanPostProcessor {
 
         val handlerMapping = applicationContext.getBean(RequestMappingHandlerMapping::class.java)
 
-        autoMappingRequestHandlers.forEach {
+        autoMappingRequestResolvers.forEach {
             it.mapping(bean, beanName).forEach { info ->
                 // 逐个注册
                 handlerMapping.registerMapping(info.mapping, info.bean, info.method)

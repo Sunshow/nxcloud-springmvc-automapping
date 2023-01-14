@@ -1,6 +1,6 @@
 package nxcloud.ext.springmvc.automapping.sample
 
-import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestHandler
+import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestResolver
 import nxcloud.ext.springmvc.automapping.spi.RequestHandlerInfo
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -11,7 +11,7 @@ import org.springframework.web.util.pattern.PathPatternParser
 
 
 @Component
-class ContractAutoMappingRequestHandler : AutoMappingRequestHandler {
+class ContractAutoMappingRequestResolver : AutoMappingRequestResolver {
 
     override fun mapping(bean: Any, beanName: String): List<RequestHandlerInfo> {
         val options = BuilderConfiguration()
