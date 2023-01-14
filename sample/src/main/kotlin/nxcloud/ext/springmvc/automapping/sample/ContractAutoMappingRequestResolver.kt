@@ -13,7 +13,7 @@ import org.springframework.web.util.pattern.PathPatternParser
 @Component
 class ContractAutoMappingRequestResolver : AutoMappingRequestResolver {
 
-    override fun mapping(bean: Any, beanName: String): List<RequestResolvedInfo> {
+    override fun resolveMapping(bean: Any, beanName: String): List<RequestResolvedInfo> {
         val options = BuilderConfiguration()
         options.patternParser = PathPatternParser()
 
@@ -51,4 +51,8 @@ class ContractAutoMappingRequestResolver : AutoMappingRequestResolver {
         )
     }
 
+    override fun isSupportedMapping(bean: Any, beanName: String): Boolean {
+        return true
+    }
+    
 }

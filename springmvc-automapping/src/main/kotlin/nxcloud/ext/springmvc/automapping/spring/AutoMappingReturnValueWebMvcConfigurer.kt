@@ -2,7 +2,9 @@ package nxcloud.ext.springmvc.automapping.spring
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nxcloud.ext.springmvc.automapping.context.AutoMappingContext
+import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestResolver
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationContext
 import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler
@@ -13,6 +15,9 @@ class AutoMappingReturnValueWebMvcConfigurer : WebMvcConfigurer {
 
     @Autowired
     private lateinit var autoMappingContext: AutoMappingContext
+
+    @Autowired
+    private lateinit var applicationContext: ApplicationContext
 
     @Autowired
     private lateinit var converters: List<HttpMessageConverter<*>>
@@ -37,6 +42,7 @@ class AutoMappingReturnValueWebMvcConfigurer : WebMvcConfigurer {
         resolvers.add(
             AutoMappingRequestBodyArgumentResolver(
                 autoMappingContext,
+                applicationContext.getBeansOfType(AutoMappingRequestResolver::class.java).values.toList(),
                 objectMapper,
             )
         )

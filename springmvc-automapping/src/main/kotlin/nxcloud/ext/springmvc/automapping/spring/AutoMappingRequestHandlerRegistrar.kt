@@ -40,11 +40,13 @@ class AutoMappingRequestHandlerRegistrar : BeanPostProcessor {
         val handlerMapping = applicationContext.getBean(RequestMappingHandlerMapping::class.java)
 
         autoMappingRequestResolvers.forEach {
-            it.mapping(bean, beanName).forEach { resolved ->
-                // 逐个注册
-                handlerMapping.registerMapping(resolved.mapping, resolved.bean, resolved.method)
-                logger.info {
-                    "注册自动映射: ${bean.javaClass.canonicalName} - ${resolved.mapping}"
+            if (it.isSupportedMapping(bean, beanName)) {
+                it.resolveMapping(bean, beanName).forEach { resolved ->
+                    // 逐个注册
+                    handlerMapping.registerMapping(resolved.mapping, resolved.bean, resolved.method)
+                    logger.info {
+                        "注册自动映射: ${bean.javaClass.canonicalName} - ${resolved.mapping}"
+                    }
                 }
             }
         }
