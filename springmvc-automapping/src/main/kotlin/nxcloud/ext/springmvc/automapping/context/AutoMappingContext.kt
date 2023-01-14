@@ -47,14 +47,14 @@ class AutoMappingContext(
     }
 
     private fun isAutoMappingAnnotationPresent(type: Class<*>, annotationClass: Class<out Annotation>): Boolean {
-        val hasAnnotation = AnnotatedElementUtils.isAnnotated(type, annotationClass)
+        val hasAnnotation = AnnotatedElementUtils.hasAnnotation(type, annotationClass)
         if (hasAnnotation) {
             return true
         }
         // 查找接口上的注解
         return ClassUtils.getAllInterfacesForClass(type)
             .any {
-                AnnotatedElementUtils.isAnnotated(it, annotationClass)
+                AnnotatedElementUtils.hasAnnotation(it, annotationClass)
             }
     }
 }
