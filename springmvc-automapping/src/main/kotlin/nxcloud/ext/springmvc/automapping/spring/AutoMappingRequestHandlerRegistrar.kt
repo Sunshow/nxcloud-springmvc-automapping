@@ -43,6 +43,9 @@ class AutoMappingRequestHandlerRegistrar : BeanPostProcessor {
             it.mapping(bean, beanName).forEach { info ->
                 // 逐个注册
                 handlerMapping.registerMapping(info.mapping, info.bean, info.method)
+                logger.info {
+                    "注册自动映射: ${bean.javaClass.canonicalName} - ${info.mapping}"
+                }
             }
         }
 
