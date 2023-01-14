@@ -1,7 +1,7 @@
 package nxcloud.ext.springmvc.automapping.sample
 
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestResolver
-import nxcloud.ext.springmvc.automapping.spi.RequestHandlerInfo
+import nxcloud.ext.springmvc.automapping.spi.RequestResolvedInfo
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.RequestMethod
@@ -13,12 +13,12 @@ import org.springframework.web.util.pattern.PathPatternParser
 @Component
 class ContractAutoMappingRequestResolver : AutoMappingRequestResolver {
 
-    override fun mapping(bean: Any, beanName: String): List<RequestHandlerInfo> {
+    override fun mapping(bean: Any, beanName: String): List<RequestResolvedInfo> {
         val options = BuilderConfiguration()
         options.patternParser = PathPatternParser()
 
         return listOf(
-            RequestHandlerInfo(
+            RequestResolvedInfo(
                 RequestMappingInfo
                     .paths("/rename")
                     .consumes(MediaType.APPLICATION_JSON_VALUE)
@@ -28,7 +28,7 @@ class ContractAutoMappingRequestResolver : AutoMappingRequestResolver {
                 bean,
                 bean.javaClass.getMethod("rename", User::class.java)
             ),
-            RequestHandlerInfo(
+            RequestResolvedInfo(
                 RequestMappingInfo
                     .paths("/info")
                     .consumes(MediaType.APPLICATION_JSON_VALUE)
@@ -38,7 +38,7 @@ class ContractAutoMappingRequestResolver : AutoMappingRequestResolver {
                 bean,
                 bean.javaClass.getMethod("info")
             ),
-            RequestHandlerInfo(
+            RequestResolvedInfo(
                 RequestMappingInfo
                     .paths("/submit")
                     .consumes(MediaType.APPLICATION_JSON_VALUE)
