@@ -1,4 +1,5 @@
 # nxcloud-springmvc-automapping
+
 自动将指定注解的类方法注册到 SpringMVC RequestMapping 用于 REST 访问
 
 ## 设计目标
@@ -55,4 +56,100 @@ public class GetUserUseCase {
 @RequestMapping(value = "/api/user/getUser", method = RequestMethod.POST)
 @ResponseBody
 GetUserUseCase.Output getUser(@RequestBody GetUserUseCase.Input input);
+```
+
+示例代码使用 Kotlin 编写，Java 可自行转换
+
+### 1. 定义一个注解用于标记需要自动映射的用例 (也可以基于父类映射, 但实际情况不应该是所有用例都映射)
+
+```kotlin
+/**
+ * 默认用于标识自动映射的注解
+ */
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+@MustBeDocumented
+annotation class AutoMappingUseCase
+```
+
+### 2. 在启动类上添加注解 @EnableAutoMapping
+
+```kotlin
+@NXEnableSpringMvcAutoMapping(
+    basePackages = ["nxcloud.sample.api.domain"],
+    autoMappingAnnotations = [AutoMappingUseCase::class]
+)
+@SpringBootApplication
+class NXCloudSampleApiApplication
+
+fun main(args: Array<String>) {
+    runApplication<NXCloudSampleApiApplication>(*args)
+}
+```
+
+### 3. 实现自定义映射规则
+
+```kotlin
+@Configuration
+class CommonAutoMappingConfig {
+
+    @Bean
+    protected fun domainUseCaseAutoMappingRequestResolver(): AutoMappingRequestResolver {
+        return object : AutoMappingRequestResolver {
+
+            private var methodParameterMapping: MutableMap<Method, Class<*>> = mutableMapOf()
+
+            private val options = RequestMappingInfo.BuilderConfiguration()
+                .apply {
+                    patternParser = PathPatternParser()
+                }
+
+            override fun resolveMapping(bean: Any, beanName: String): List<RequestResolvedInfo> {
+                if (!AbstractUseCase::class.java.isAssignableFrom(bean::class.java)) {
+                    return emptyList()
+                }
+                val method = bean.javaClass.methods.first {
+                    it.name == "execute" && it.parameterCount == 1
+                }
+
+                val module = bean.javaClass.packageName
+                    .substringAfter("nxcloud.sample.api.domain.")
+                    .substringBefore(".")
+
+                // 需要把抽象类的抽象参数映射为当前 UseCase 的实际参数
+                methodParameterMapping[method] =
+                    Class.forName("${AopUtils.getTargetClass(bean).canonicalName}\$InputData")
+
+                return listOf(
+                    RequestResolvedInfo(
+                        RequestMappingInfo
+                            .paths("/api/${module}/${beanName.substringBeforeLast("UseCase")}")
+                            .consumes(MediaType.APPLICATION_JSON_VALUE)
+                            .methods(RequestMethod.POST)
+                            .options(options)
+                            .build(),
+                        bean,
+                        method
+                    ),
+                )
+            }
+
+            override fun resolveParameterClass(parameter: MethodParameter): Class<*> {
+                return methodParameterMapping[parameter.method!!]!!
+            }
+
+            override fun isSupportedMapping(bean: Any, beanName: String): Boolean {
+                return AbstractUseCase::class.java.isAssignableFrom(bean::class.java)
+            }
+
+            override fun isSupportedParameterClass(parameter: MethodParameter): Boolean {
+                return parameter.method
+                    ?.let {
+                        methodParameterMapping.containsKey(it)
+                    }
+                    ?: false
+            }
+        }
+    }
+}
 ```
