@@ -25,6 +25,7 @@ springboot-starter-logging = { module = "org.springframework.boot:spring-boot-st
 springboot-starter-aop = { module = "org.springframework.boot:spring-boot-starter-aop", version.ref = "org-springframework-boot" }
 kotlin-logging-jvm = { module = "io.github.microutils:kotlin-logging-jvm", version.ref = "kotlin-logging-jvm" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback" }
+nxcloud-core-spring-boot-autoconfigure = { module = "nxcloud.foundation:nxcloud-core-spring-boot-autoconfigure", version.ref = "nxcloud-foundation-core" }
 nxcloud-core-spring-boot-starter = { module = "nxcloud.foundation:nxcloud-core-spring-boot-starter", version.ref = "nxcloud-foundation-core" }
 jakarta-annotation-api = { module = "jakarta.annotation:jakarta.annotation-api", version.ref = "jakarta-annotation" }
 jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "jakarta-servlet" }

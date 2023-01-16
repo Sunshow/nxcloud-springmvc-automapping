@@ -1,4 +1,6 @@
 dependencies {
+    api(project(":springmvc-automapping-base"))
+
     compileOnly(libs.jakarta.annotation.api)
     compileOnly(libs.jakarta.servlet.api)
 

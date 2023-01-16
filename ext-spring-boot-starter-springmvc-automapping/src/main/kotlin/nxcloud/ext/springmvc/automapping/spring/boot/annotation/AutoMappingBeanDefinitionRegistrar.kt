@@ -1,7 +1,6 @@
-package nxcloud.ext.springmvc.automapping.spring
+package nxcloud.ext.springmvc.automapping.spring.boot.annotation
 
 import mu.KotlinLogging
-import nxcloud.ext.springmvc.automapping.annotation.NXEnableSpringMvcAutoMapping
 import nxcloud.ext.springmvc.automapping.context.AutoMappingContext
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
@@ -41,24 +40,6 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar {
                 .addConstructorArgValue(basePackages)
                 .addConstructorArgValue(attributes["autoMappingAnnotations"])
                 .addConstructorArgValue(attributes["autoMappingBeanTypes"])
-                .beanDefinition
-        )
-
-        registry.registerBeanDefinition(
-            "nxAutoMappingRequestHandlerRegistrar",
-            BeanDefinitionBuilder
-                .genericBeanDefinition(
-                    AutoMappingRequestHandlerRegistrar::class.java
-                )
-                .beanDefinition
-        )
-
-        registry.registerBeanDefinition(
-            "nxAutoMappingReturnValueWebMvcConfigurer",
-            BeanDefinitionBuilder
-                .genericBeanDefinition(
-                    AutoMappingReturnValueWebMvcConfigurer::class.java
-                )
                 .beanDefinition
         )
 

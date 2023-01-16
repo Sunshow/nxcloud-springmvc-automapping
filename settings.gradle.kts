@@ -1,4 +1,5 @@
 rootProject.name = "nxcloud-springmvc-automapping"
+include(":springmvc-automapping-base")
 include(":springmvc-automapping")
 include(":ext-spring-boot-starter-springmvc-automapping")
 include(":sample")

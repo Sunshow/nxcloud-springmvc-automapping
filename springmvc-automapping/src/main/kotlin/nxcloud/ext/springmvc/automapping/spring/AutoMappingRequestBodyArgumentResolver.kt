@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import nxcloud.ext.springmvc.automapping.context.AutoMappingContext
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestParameterInjector
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestResolver
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.MethodParameter
 import org.springframework.util.StreamUtils
 import org.springframework.web.bind.support.WebDataBinderFactory
@@ -14,12 +15,19 @@ import java.io.IOException
 import javax.servlet.http.HttpServletRequest
 
 
-class AutoMappingRequestBodyArgumentResolver(
-    private val autoMappingContext: AutoMappingContext,
-    private val autoMappingRequestResolvers: List<AutoMappingRequestResolver>,
-    private val autoMappingRequestParameterInjectors: List<AutoMappingRequestParameterInjector>,
-    private val objectMapper: ObjectMapper,
-) : HandlerMethodArgumentResolver {
+class AutoMappingRequestBodyArgumentResolver : HandlerMethodArgumentResolver {
+
+    @Autowired
+    private lateinit var objectMapper: ObjectMapper
+
+    @Autowired
+    private lateinit var autoMappingContext: AutoMappingContext
+
+    @Autowired(required = false)
+    private var autoMappingRequestResolvers: List<AutoMappingRequestResolver>? = null
+
+    @Autowired(required = false)
+    private var autoMappingRequestParameterInjectors: List<AutoMappingRequestParameterInjector>? = null
 
     private val attrJsonRequestBody = "JSON_REQUEST_BODY"
 
@@ -36,7 +44,7 @@ class AutoMappingRequestBodyArgumentResolver(
         val body = getRequestBody(webRequest)
 
         val parameterType = autoMappingRequestResolvers
-            .firstOrNull {
+            ?.firstOrNull {
                 it.isSupportedParameterClass(parameter)
             }
             ?.resolveParameterClass(parameter)
@@ -45,7 +53,7 @@ class AutoMappingRequestBodyArgumentResolver(
         val parameterObj = objectMapper.readValue(body, parameterType)
 
         autoMappingRequestParameterInjectors
-            .forEach {
+            ?.forEach {
                 it.inject(arrayOf(parameterObj))
             }
 

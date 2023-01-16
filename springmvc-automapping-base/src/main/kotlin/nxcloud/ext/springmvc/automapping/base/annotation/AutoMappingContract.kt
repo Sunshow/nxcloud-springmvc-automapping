@@ -1,4 +1,4 @@
-package nxcloud.ext.springmvc.automapping.annotation
+package nxcloud.ext.springmvc.automapping.base.annotation
 
 /**
  * 默认用于标识自动映射的注解
