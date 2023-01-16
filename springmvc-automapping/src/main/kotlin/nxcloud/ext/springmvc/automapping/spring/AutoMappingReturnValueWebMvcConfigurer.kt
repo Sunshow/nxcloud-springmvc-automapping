@@ -2,6 +2,7 @@ package nxcloud.ext.springmvc.automapping.spring
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nxcloud.ext.springmvc.automapping.context.AutoMappingContext
+import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestParameterInjector
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestResolver
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
@@ -43,6 +44,7 @@ class AutoMappingReturnValueWebMvcConfigurer : WebMvcConfigurer {
             AutoMappingRequestBodyArgumentResolver(
                 autoMappingContext,
                 applicationContext.getBeansOfType(AutoMappingRequestResolver::class.java).values.toList(),
+                applicationContext.getBeansOfType(AutoMappingRequestParameterInjector::class.java).values.toList(),
                 objectMapper,
             )
         )

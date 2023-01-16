@@ -2,6 +2,7 @@ package nxcloud.ext.springmvc.automapping.spring
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nxcloud.ext.springmvc.automapping.context.AutoMappingContext
+import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestParameterInjector
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestResolver
 import org.springframework.core.MethodParameter
 import org.springframework.util.StreamUtils
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest
 class AutoMappingRequestBodyArgumentResolver(
     private val autoMappingContext: AutoMappingContext,
     private val autoMappingRequestResolvers: List<AutoMappingRequestResolver>,
+    private val autoMappingRequestParameterInjectors: List<AutoMappingRequestParameterInjector>,
     private val objectMapper: ObjectMapper,
 ) : HandlerMethodArgumentResolver {
 
@@ -40,7 +42,14 @@ class AutoMappingRequestBodyArgumentResolver(
             ?.resolveParameterClass(parameter)
             ?: parameter.parameterType
 
-        return objectMapper.readValue(body, parameterType)
+        val parameterObj = objectMapper.readValue(body, parameterType)
+
+        autoMappingRequestParameterInjectors
+            .forEach {
+                it.inject(arrayOf(parameterObj))
+            }
+
+        return parameterObj
     }
 
     private fun getRequestBody(webRequest: NativeWebRequest): String {
