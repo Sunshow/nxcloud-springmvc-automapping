@@ -3,14 +3,14 @@ package nxcloud.ext.springmvc.automapping.spring
 import mu.KotlinLogging
 import nxcloud.ext.springmvc.automapping.context.AutoMappingContext
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestResolver
+import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.BeanPostProcessor
 import org.springframework.context.ApplicationContext
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
-import javax.annotation.PostConstruct
 
 
-class AutoMappingRequestHandlerRegistrar : BeanPostProcessor {
+class AutoMappingRequestHandlerRegistrar : BeanPostProcessor, InitializingBean {
 
     private val logger = KotlinLogging.logger {}
 
@@ -22,8 +22,10 @@ class AutoMappingRequestHandlerRegistrar : BeanPostProcessor {
 
     private val autoMappingRequestResolvers: MutableList<AutoMappingRequestResolver> = mutableListOf()
 
-    @PostConstruct
-    private fun init() {
+    @Autowired
+    private lateinit var requestMappingHandlerMapping: RequestMappingHandlerMapping
+
+    override fun afterPropertiesSet() {
         autoMappingRequestResolvers.addAll(
             applicationContext.getBeansOfType(AutoMappingRequestResolver::class.java).values
         )
@@ -37,13 +39,11 @@ class AutoMappingRequestHandlerRegistrar : BeanPostProcessor {
             "处理自动映射 Bean: $beanName - ${bean.javaClass.canonicalName}"
         }
 
-        val handlerMapping = applicationContext.getBean(RequestMappingHandlerMapping::class.java)
-
         autoMappingRequestResolvers.forEach {
             if (it.isSupportedMapping(bean, beanName)) {
                 it.resolveMapping(bean, beanName).forEach { resolved ->
                     // 逐个注册
-                    handlerMapping.registerMapping(resolved.mapping, resolved.bean, resolved.method)
+                    requestMappingHandlerMapping.registerMapping(resolved.mapping, resolved.bean, resolved.method)
                     logger.info {
                         "注册自动映射: ${bean.javaClass.canonicalName} - ${resolved.mapping}"
                     }
