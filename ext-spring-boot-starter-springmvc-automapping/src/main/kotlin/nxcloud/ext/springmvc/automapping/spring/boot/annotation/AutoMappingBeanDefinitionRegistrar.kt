@@ -71,10 +71,10 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar, Enviro
         }
         provider.addIncludeFilter(AnnotationTypeFilter(AutoMappingContract::class.java))
 
+        val contractData = mutableListOf<AutoMappingContractData>()
+
         // Scan all packages
         for (basePackage in basePackages) {
-            val contractData = mutableListOf<AutoMappingContractData>()
-
             for (beanDefinition in provider.findCandidateComponents(basePackage)) {
                 val metadata = (beanDefinition as ScannedGenericBeanDefinition).metadata
                 val typeAttributes = metadata.annotations
@@ -107,21 +107,19 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar, Enviro
                         )
                     }
             }
-
-            if (contractData.isNotEmpty()) {
-                // 注册供后续处理
-                registry.registerBeanDefinition(
-                    contractRegistrarBeanName,
-                    BeanDefinitionBuilder
-                        .genericBeanDefinition(
-                            AutoMappingContractRegistrar::class.java
-                        ) {
-                            AutoMappingContractRegistrar(contractData)
-                        }
-                        .beanDefinition
-                )
-            }
         }
+
+        // 注册供后续处理
+        registry.registerBeanDefinition(
+            contractRegistrarBeanName,
+            BeanDefinitionBuilder
+                .genericBeanDefinition(
+                    AutoMappingContractRegistrar::class.java
+                ) {
+                    AutoMappingContractRegistrar(contractData.toList())
+                }
+                .beanDefinition
+        )
 
         logger.info {
             "启用 SpringMvc 自动映射, 处理器注册完成"
@@ -135,7 +133,14 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar, Enviro
     ): AutoMappingContractData {
         val method = methodAttribute.getEnum<AutoMappingContract.Method>("method")
         val beanType = methodAttribute.getClass<Any>("beanType")
+
+        // 默认使用同名方法查找
         val beanMethod = methodAttribute.getString("beanMethod")
+            .takeIf {
+                it.isNotEmpty()
+            }
+            ?: methodName
+
         val paths = methodAttribute.getStringArray("paths").toMutableList()
         if (paths.isEmpty()) {
             // 如果方法未声明路径 默认使用方法名
