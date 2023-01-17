@@ -5,7 +5,7 @@ import kotlin.reflect.KClass
 /**
  * 默认用于标识遵守自动映射协议的接口的注解
  */
-@Target(AnnotationTarget.CLASS)
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 @MustBeDocumented
 annotation class AutoMappingContract(

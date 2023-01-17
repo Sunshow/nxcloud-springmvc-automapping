@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component
 @AutoMappingContract(paths = ["/user"])
 interface UseCaseContract {
 
-    fun info(): User
+    @AutoMappingContract(method = AutoMappingContract.Method.GET, beanType = UserService::class)
+    fun info()
 
 }
 
