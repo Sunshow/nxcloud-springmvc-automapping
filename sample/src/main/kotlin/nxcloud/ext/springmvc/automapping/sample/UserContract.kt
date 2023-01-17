@@ -11,6 +11,9 @@ interface UseCaseContract {
     @AutoMappingContract(method = AutoMappingContract.Method.GET, beanType = UserService::class)
     fun info()
 
+    @AutoMappingContract(beanType = UserService::class)
+    fun rename()
+    
 }
 
 
