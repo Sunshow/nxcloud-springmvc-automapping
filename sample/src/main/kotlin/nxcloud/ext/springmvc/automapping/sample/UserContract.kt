@@ -1,10 +1,20 @@
 package nxcloud.ext.springmvc.automapping.sample
 
+import nxcloud.ext.springmvc.automapping.base.annotation.AutoMappingBean
 import nxcloud.ext.springmvc.automapping.base.annotation.AutoMappingContract
 import org.springframework.stereotype.Component
 
-@AutoMappingContract
-interface UserContract {
+// 按协议解析
+@AutoMappingContract(paths = ["/user"])
+interface UseCaseContract {
+
+    fun info(): User
+
+}
+
+
+@AutoMappingBean
+interface UserService {
 
     fun info(): User
 
@@ -14,7 +24,7 @@ interface UserContract {
 }
 
 @Component
-class UserContractImpl : UserContract {
+class UserServiceImpl : UserService {
     override fun info(): User {
         return User(
             name = "info"

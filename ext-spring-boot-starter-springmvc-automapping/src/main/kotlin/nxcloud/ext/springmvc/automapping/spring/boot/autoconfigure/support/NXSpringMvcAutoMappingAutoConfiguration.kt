@@ -1,6 +1,5 @@
 package nxcloud.ext.springmvc.automapping.spring.boot.autoconfigure.support
 
-import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestResolver
 import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestBodyArgumentResolver
 import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestHandlerRegistrar
 import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestResponseBodyMethodProcessor
@@ -22,12 +21,8 @@ class NXSpringMvcAutoMappingAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(AutoMappingRequestHandlerRegistrar::class)
-    protected fun autoMappingRequestHandlerRegistrar(
-        autoMappingRequestResolvers: List<AutoMappingRequestResolver>,
-    ): AutoMappingRequestHandlerRegistrar {
-        return AutoMappingRequestHandlerRegistrar(
-            autoMappingRequestResolvers,
-        )
+    protected fun autoMappingRequestHandlerRegistrar(): AutoMappingRequestHandlerRegistrar {
+        return AutoMappingRequestHandlerRegistrar()
     }
 
     @Bean

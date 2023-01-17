@@ -1,7 +1,7 @@
 package nxcloud.ext.springmvc.automapping.sample
 
+import nxcloud.ext.springmvc.automapping.spi.AutoMappingRegistration
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestResolver
-import nxcloud.ext.springmvc.automapping.spi.RequestResolvedInfo
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.RequestMethod
@@ -11,14 +11,14 @@ import org.springframework.web.util.pattern.PathPatternParser
 
 
 @Component
-class ContractAutoMappingRequestResolver : AutoMappingRequestResolver {
+class BeanTypeAutoMappingRequestResolver : AutoMappingRequestResolver {
 
-    override fun resolveMapping(bean: Any, beanName: String): List<RequestResolvedInfo> {
+    override fun resolveMapping(bean: Any, beanName: String): List<AutoMappingRegistration> {
         val options = BuilderConfiguration()
         options.patternParser = PathPatternParser()
 
         return listOf(
-            RequestResolvedInfo(
+            AutoMappingRegistration(
                 RequestMappingInfo
                     .paths("/rename")
                     .consumes(MediaType.APPLICATION_JSON_VALUE)
@@ -28,7 +28,7 @@ class ContractAutoMappingRequestResolver : AutoMappingRequestResolver {
                 bean,
                 bean.javaClass.getMethod("rename", User::class.java)
             ),
-            RequestResolvedInfo(
+            AutoMappingRegistration(
                 RequestMappingInfo
                     .paths("/info")
                     .consumes(MediaType.APPLICATION_JSON_VALUE)
@@ -38,7 +38,7 @@ class ContractAutoMappingRequestResolver : AutoMappingRequestResolver {
                 bean,
                 bean.javaClass.getMethod("info")
             ),
-            RequestResolvedInfo(
+            AutoMappingRegistration(
                 RequestMappingInfo
                     .paths("/submit")
                     .consumes(MediaType.APPLICATION_JSON_VALUE)
@@ -54,5 +54,5 @@ class ContractAutoMappingRequestResolver : AutoMappingRequestResolver {
     override fun isSupportedMapping(bean: Any, beanName: String): Boolean {
         return true
     }
-    
+
 }
