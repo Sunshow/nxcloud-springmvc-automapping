@@ -25,7 +25,7 @@ class AutoMappingHandlerMethodArgumentResolver : HandlerMethodArgumentResolver {
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         return parameter.method
             ?.let {
-                autoMappingRequestParameterTypeBinding.isSupportedParameterType(it, parameter.parameterType)
+                autoMappingRequestParameterTypeBinding.isSupportedParameterType(parameter)
             }
             ?: false
     }
@@ -38,7 +38,7 @@ class AutoMappingHandlerMethodArgumentResolver : HandlerMethodArgumentResolver {
     ): Any? {
         // 拿到实际的类型
         val parameterType =
-            autoMappingRequestParameterTypeBinding.resolveBinding(parameter.method!!, parameter.parameterType)
+            autoMappingRequestParameterTypeBinding.resolveBinding(parameter.method!!, parameter)
                 ?: return null
 
         // 从请求中解析出参数并构建相应的对象

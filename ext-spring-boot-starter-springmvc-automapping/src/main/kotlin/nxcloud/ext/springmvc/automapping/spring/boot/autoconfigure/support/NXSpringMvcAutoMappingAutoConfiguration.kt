@@ -1,6 +1,7 @@
 package nxcloud.ext.springmvc.automapping.spring.boot.autoconfigure.support
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import nxcloud.ext.springmvc.automapping.spi.impl.FormUrlencodedAutoMappingRequestParameterResolver
 import nxcloud.ext.springmvc.automapping.spi.impl.JacksonAutoMappingRequestParameterResolver
 import nxcloud.ext.springmvc.automapping.spring.AutoMappingHandlerMethodArgumentResolver
 import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestHandlerRegistrar
@@ -53,6 +54,12 @@ class NXSpringMvcAutoMappingAutoConfiguration {
     @ConditionalOnMissingBean(JacksonAutoMappingRequestParameterResolver::class)
     protected fun jacksonAutoMappingRequestParameterResolver(objectMapper: ObjectMapper): JacksonAutoMappingRequestParameterResolver {
         return JacksonAutoMappingRequestParameterResolver(objectMapper)
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(FormUrlencodedAutoMappingRequestParameterResolver::class)
+    protected fun formUrlencodedAutoMappingRequestParameterResolver(): FormUrlencodedAutoMappingRequestParameterResolver {
+        return FormUrlencodedAutoMappingRequestParameterResolver()
     }
 
     @Configuration
