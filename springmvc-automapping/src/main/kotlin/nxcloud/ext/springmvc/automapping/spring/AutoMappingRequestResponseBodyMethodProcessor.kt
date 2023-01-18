@@ -1,6 +1,5 @@
 package nxcloud.ext.springmvc.automapping.spring
 
-import nxcloud.ext.springmvc.automapping.context.AutoMappingContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.MethodParameter
 import org.springframework.http.converter.HttpMessageConverter
@@ -14,10 +13,15 @@ class AutoMappingRequestResponseBodyMethodProcessor(
 ) : RequestResponseBodyMethodProcessor(converters) {
 
     @Autowired
-    private lateinit var autoMappingContext: AutoMappingContext
+    private lateinit var autoMappingRequestParameterTypeBinding: AutoMappingRequestParameterTypeBinding
 
     override fun supportsReturnType(returnType: MethodParameter): Boolean {
-        return autoMappingContext.isSupported(returnType.containingClass)
+        // 处理所有自动映射托管的方法
+        return returnType.method
+            ?.let {
+                autoMappingRequestParameterTypeBinding.isSupportedMethod(it)
+            }
+            ?: false
     }
 
     override fun handleReturnValue(

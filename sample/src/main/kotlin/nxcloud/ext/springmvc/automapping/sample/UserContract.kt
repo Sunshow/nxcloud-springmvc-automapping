@@ -14,6 +14,9 @@ interface UseCaseContract {
     @AutoMappingContract(beanType = UserService::class)
     fun rename()
 
+    @AutoMappingContract(method = AutoMappingContract.Method.GET, beanType = UserService::class)
+    fun submit()
+
     @AutoMappingContract(
         paths = ["/test1", "/test2"],
         method = AutoMappingContract.Method.GET,
@@ -21,6 +24,12 @@ interface UseCaseContract {
         beanMethod = "info"
     )
     fun test()
+
+    @AutoMappingContract(
+        beanType = UserService::class,
+        consumes = ["application/x-www-form-urlencoded"]
+    )
+    fun create()
 }
 
 
@@ -32,6 +41,8 @@ interface UserService {
     fun rename(user: User): User
 
     fun submit(user: User)
+
+    fun create(name: String, age: Int): User
 }
 
 @Component
@@ -48,6 +59,13 @@ class UserServiceImpl : UserService {
         )
     }
 
+    override fun create(name: String, age: Int): User {
+        return User(
+            name = name,
+            age = age,
+        )
+    }
+
     override fun submit(user: User) {
         println(user)
     }
@@ -55,4 +73,5 @@ class UserServiceImpl : UserService {
 
 data class User(
     val name: String,
+    val age: Int = 0,
 )

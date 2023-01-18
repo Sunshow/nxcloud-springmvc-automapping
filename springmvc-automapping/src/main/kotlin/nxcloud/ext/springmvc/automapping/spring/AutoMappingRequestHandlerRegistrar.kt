@@ -2,7 +2,7 @@ package nxcloud.ext.springmvc.automapping.spring
 
 import mu.KotlinLogging
 import nxcloud.ext.springmvc.automapping.context.AutoMappingContext
-import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestResolver
+import nxcloud.ext.springmvc.automapping.spi.AutoMappingBeanRequestResolver
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.BeanPostProcessor
 import org.springframework.context.annotation.Lazy
@@ -17,7 +17,10 @@ class AutoMappingRequestHandlerRegistrar : BeanPostProcessor {
     private lateinit var autoMappingContext: AutoMappingContext
 
     @Autowired(required = false)
-    private var autoMappingRequestResolvers: List<AutoMappingRequestResolver>? = null
+    private var autoMappingBeanRequestResolvers: List<AutoMappingBeanRequestResolver>? = null
+
+    @Autowired(required = false)
+    private lateinit var autoMappingRequestParameterTypeBinding: AutoMappingRequestParameterTypeBinding
 
     @Lazy
     @Autowired
@@ -31,9 +34,9 @@ class AutoMappingRequestHandlerRegistrar : BeanPostProcessor {
             "处理自动映射 Bean: $beanName - ${bean.javaClass.canonicalName}"
         }
 
-        autoMappingRequestResolvers
+        autoMappingBeanRequestResolvers
             ?.forEach {
-                if (it.isSupportedMapping(bean, beanName)) {
+                if (it.isSupported(bean, beanName)) {
                     it.resolveMapping(bean, beanName)
                         .forEach { registration ->
                             // 逐个注册
@@ -42,6 +45,7 @@ class AutoMappingRequestHandlerRegistrar : BeanPostProcessor {
                                 registration.bean,
                                 registration.method
                             )
+                            autoMappingRequestParameterTypeBinding.registerBinding(registration.method)
                             logger.info {
                                 "注册自动映射: ${bean.javaClass.canonicalName} - ${registration.mapping}"
                             }

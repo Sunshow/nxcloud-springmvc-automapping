@@ -4,18 +4,20 @@ import org.springframework.core.MethodParameter
 import org.springframework.web.context.request.NativeWebRequest
 
 /**
- * 注入上下文中的属性到需要的方法中, 例如通常在拦截器中处理的属性如 userId 等
+ * 解析实际请求时传入的请求参数并转换为需要的类型实例
  */
-interface AutoMappingRequestParameterInjector {
+interface AutoMappingRequestParameterResolver {
+
+    fun resolveParameter(
+        parameter: MethodParameter,
+        resolvedParameterType: Class<*>,
+        webRequest: NativeWebRequest,
+    ): Any?
 
     /**
-     * 注入属性
+     * 是否支持参数解析
      */
-    fun inject(parameterObj: Any) {
-    }
-
     fun isSupported(
-        parameterObj: Any,
         parameter: MethodParameter,
         resolvedParameterType: Class<*>,
         webRequest: NativeWebRequest,

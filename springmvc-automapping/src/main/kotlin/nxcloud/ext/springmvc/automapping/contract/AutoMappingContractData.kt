@@ -11,4 +11,6 @@ class AutoMappingContractData(
     val beanType: Class<*>,
     // 响应处理的Bean方法名, 暂不支持多个同名方法
     val beanMethod: String = "",
+    // 消费 Content-Type 类型
+    val consumes: Array<String>,
 )

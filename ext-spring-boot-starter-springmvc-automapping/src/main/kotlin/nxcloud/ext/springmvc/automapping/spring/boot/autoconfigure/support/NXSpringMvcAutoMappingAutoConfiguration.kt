@@ -1,7 +1,10 @@
 package nxcloud.ext.springmvc.automapping.spring.boot.autoconfigure.support
 
-import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestBodyArgumentResolver
+import com.fasterxml.jackson.databind.ObjectMapper
+import nxcloud.ext.springmvc.automapping.spi.impl.JacksonAutoMappingRequestParameterResolver
+import nxcloud.ext.springmvc.automapping.spring.AutoMappingHandlerMethodArgumentResolver
 import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestHandlerRegistrar
+import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestParameterTypeBinding
 import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestResponseBodyMethodProcessor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.AutoConfiguration
@@ -26,9 +29,9 @@ class NXSpringMvcAutoMappingAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(AutoMappingRequestBodyArgumentResolver::class)
-    protected fun autoMappingRequestBodyArgumentResolver(): AutoMappingRequestBodyArgumentResolver {
-        return AutoMappingRequestBodyArgumentResolver()
+    @ConditionalOnMissingBean(AutoMappingHandlerMethodArgumentResolver::class)
+    protected fun autoMappingRequestBodyArgumentResolver(): AutoMappingHandlerMethodArgumentResolver {
+        return AutoMappingHandlerMethodArgumentResolver()
     }
 
     @Bean
@@ -39,12 +42,25 @@ class NXSpringMvcAutoMappingAutoConfiguration {
         return AutoMappingRequestResponseBodyMethodProcessor(converters)
     }
 
+    @Bean
+    @ConditionalOnMissingBean(AutoMappingRequestParameterTypeBinding::class)
+    protected fun autoMappingRequestParameterTypeBinding(): AutoMappingRequestParameterTypeBinding {
+        return AutoMappingRequestParameterTypeBinding()
+    }
+
+    @Bean
+    @ConditionalOnClass(ObjectMapper::class)
+    @ConditionalOnMissingBean(JacksonAutoMappingRequestParameterResolver::class)
+    protected fun jacksonAutoMappingRequestParameterResolver(objectMapper: ObjectMapper): JacksonAutoMappingRequestParameterResolver {
+        return JacksonAutoMappingRequestParameterResolver(objectMapper)
+    }
+
     @Configuration
     @ConditionalOnClass(WebMvcConfigurer::class)
     internal class AutoMappingReturnValueWebMvcConfigurer : WebMvcConfigurer {
 
         @Autowired
-        private lateinit var autoMappingRequestBodyArgumentResolver: AutoMappingRequestBodyArgumentResolver
+        private lateinit var autoMappingHandlerMethodArgumentResolver: AutoMappingHandlerMethodArgumentResolver
 
         @Autowired
         private lateinit var autoMappingRequestResponseBodyMethodProcessor: AutoMappingRequestResponseBodyMethodProcessor
@@ -60,7 +76,7 @@ class NXSpringMvcAutoMappingAutoConfiguration {
 
         override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
             resolvers.add(
-                autoMappingRequestBodyArgumentResolver
+                autoMappingHandlerMethodArgumentResolver
             )
         }
 

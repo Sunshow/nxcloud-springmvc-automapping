@@ -147,6 +147,8 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar, Enviro
             paths.add("/$methodName")
         }
 
+        val consumes = methodAttribute.getStringArray("consumes")
+
         // 合并映射路径
         return typePaths
             .flatMap { prefix ->
@@ -161,6 +163,7 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar, Enviro
                     method,
                     beanType,
                     beanMethod,
+                    consumes,
                 )
             }
     }

@@ -4,11 +4,11 @@ import mu.KotlinLogging
 import nxcloud.ext.springmvc.automapping.base.annotation.AutoMappingContract
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingContractDataConverter
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingRegistration
+import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestParameterTypeBinding
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Lazy
-import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
@@ -28,6 +28,9 @@ open class AutoMappingContractRegistrar(
 
     @Autowired(required = false)
     private var converters: List<AutoMappingContractDataConverter>? = null
+
+    @Autowired
+    private lateinit var autoMappingRequestParameterTypeBinding: AutoMappingRequestParameterTypeBinding
 
     @Lazy
     @Autowired
@@ -54,7 +57,7 @@ open class AutoMappingContractRegistrar(
                 AutoMappingRegistration(
                     RequestMappingInfo
                         .paths(*data.paths)
-                        .consumes(MediaType.APPLICATION_JSON_VALUE)
+                        .consumes(*data.consumes)
                         .methods(*convertMethods(data))
                         .options(options)
                         .build(),
@@ -72,6 +75,7 @@ open class AutoMappingContractRegistrar(
                     registration.bean,
                     registration.method
                 )
+                autoMappingRequestParameterTypeBinding.registerBinding(registration.method)
                 logger.info {
                     "注册自动映射: ${registration.bean.javaClass.canonicalName} - ${registration.mapping}"
                 }
