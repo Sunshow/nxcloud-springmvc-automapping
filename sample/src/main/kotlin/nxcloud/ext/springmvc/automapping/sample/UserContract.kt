@@ -13,7 +13,14 @@ interface UseCaseContract {
 
     @AutoMappingContract(beanType = UserService::class)
     fun rename()
-    
+
+    @AutoMappingContract(
+        paths = ["/test1", "/test2"],
+        method = AutoMappingContract.Method.GET,
+        beanType = UserService::class,
+        beanMethod = "info"
+    )
+    fun test()
 }
 
 
