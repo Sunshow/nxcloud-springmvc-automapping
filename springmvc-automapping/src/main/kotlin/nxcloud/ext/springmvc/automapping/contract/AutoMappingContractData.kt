@@ -1,8 +1,11 @@
 package nxcloud.ext.springmvc.automapping.contract
 
 import nxcloud.ext.springmvc.automapping.base.annotation.AutoMappingContract
+import java.lang.reflect.Method
 
 data class AutoMappingContractData(
+    // 声明处的方法
+    val declaringMethod: Method,
     // 映射路径
     val paths: Array<String>,
     // 映射的HTTP请求方法

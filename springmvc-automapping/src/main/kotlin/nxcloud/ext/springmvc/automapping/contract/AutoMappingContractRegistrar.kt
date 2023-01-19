@@ -55,6 +55,7 @@ open class AutoMappingContractRegistrar(
             .map { data ->
                 val bean = applicationContext.getBean(data.beanType)
                 AutoMappingRegistration(
+                    data.declaringMethod,
                     RequestMappingInfo
                         .paths(*data.paths)
                         .consumes(*data.consumes)
@@ -75,7 +76,10 @@ open class AutoMappingContractRegistrar(
                     registration.bean,
                     registration.method
                 )
-                autoMappingRequestParameterTypeBinding.registerBinding(registration.method)
+                autoMappingRequestParameterTypeBinding.registerBinding(
+                    registration.method,
+                    registration.declaringMethod,
+                )
                 logger.info {
                     "注册自动映射: ${registration.bean.javaClass.canonicalName} - ${registration.mapping}"
                 }

@@ -5,12 +5,17 @@ import nxcloud.ext.springmvc.automapping.base.annotation.AutoMappingContract
 import org.springframework.stereotype.Component
 
 // 按协议解析
+@SampleSessionRequired
 @AutoMappingContract(paths = ["/user"])
 interface UseCaseContract {
 
     @AutoMappingContract(method = AutoMappingContract.Method.GET, beanType = UserService::class)
     fun info()
 
+    /**
+     * 测试注解方式验证 Session
+     */
+    @SampleSessionRequired
     @AutoMappingContract(beanType = UserService::class)
     fun rename()
 
@@ -31,7 +36,6 @@ interface UseCaseContract {
     )
     fun create()
 }
-
 
 @AutoMappingBean
 interface UserService {

@@ -100,6 +100,7 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar, Enviro
                             }
                         contractData.add(
                             annotationAttributesToContractData(
+                                metadata,
                                 typePaths,
                                 methodAttributes.first(),
                                 mm.methodName
@@ -127,6 +128,7 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar, Enviro
     }
 
     private fun annotationAttributesToContractData(
+        typeMetadata: AnnotationMetadata,
         typePaths: Array<String>,
         methodAttribute: AnnotationAttributes,
         methodName: String,
@@ -159,6 +161,10 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar, Enviro
             }
             .let {
                 AutoMappingContractData(
+                    Class.forName(typeMetadata.className).methods.first { m ->
+                        // 找到声明处的方法
+                        m.name == methodName
+                    },
                     it.toTypedArray(),
                     method,
                     beanType,

@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestParameterTypeResolver
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.MethodParameter
+import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.ui.Model
 import org.springframework.ui.ModelMap
 import java.lang.reflect.Method
@@ -27,7 +28,10 @@ open class AutoMappingRequestParameterTypeBinding {
     // 经过处理之后的映射关系
     private val bindingCache: MutableMap<Method, Array<Class<*>>> = mutableMapOf()
 
-    fun registerBinding(method: Method) {
+    // 声明处类型缓存, 缓存声明接口或者Bean的类型, 便于后续找到原始的注解信息
+    private val declaringMethodCache: MutableMap<Method, Method> = mutableMapOf()
+
+    fun registerBinding(method: Method, declaredMethod: Method?) {
         if (bindingCache.containsKey(method)) {
             return
         }
@@ -44,6 +48,9 @@ open class AutoMappingRequestParameterTypeBinding {
             ?: run {
                 originalBindingCache[method] = method.parameterTypes
             }
+
+        // 如果未指定声明处的方法, 直接使用最后处理的方法
+        declaringMethodCache[method] = declaredMethod ?: method
     }
 
     // 调用此方法时需要确保此方法一定是已经自动注册了的, 即原始映射缓存中一定存在
@@ -54,6 +61,26 @@ open class AutoMappingRequestParameterTypeBinding {
             ?: return originalParameterTypes[parameter.parameterIndex]
 
         return parameterTypes[parameter.parameterIndex]
+    }
+
+    fun <T : Annotation> getAnnotation(method: Method, annotationType: Class<T>): T? {
+        return this.getAnnotation(method, annotationType, false)
+    }
+
+    fun <T : Annotation> getAnnotation(
+        method: Method,
+        annotationType: Class<T>,
+        searchClassType: Boolean
+    ): T? {
+        if (!isSupportedMethod(method)) {
+            return null
+        }
+        val declaringMethod = declaringMethodCache[method]!!
+        var annotation = AnnotationUtils.findAnnotation(declaringMethod, annotationType)
+        if (annotation == null && searchClassType) {
+            annotation = AnnotationUtils.findAnnotation(declaringMethod.declaringClass, annotationType)
+        }
+        return annotation
     }
 
     fun isSupportedMethod(method: Method): Boolean {
