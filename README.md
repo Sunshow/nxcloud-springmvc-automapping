@@ -5,151 +5,222 @@
 ## 设计目标
 
 - 通过指定注解自动扫描用于注册的类和需要注册的方法
-- 支持自定义注册路径，也可以使用默认路径例如：/api/类名/方法名
+- 支持通过接口自定义注册路径，也可以使用默认路径例如：/api/类名/方法名
 - 通过扩展支持自定义实现注册规则
-- 保持对 SpringMVC 兼容，例如支持用传统方式对生成的返回值做封装，支持自定义拦截器等
+- 保持对 SpringMVC 兼容，例如支持用传统方式对生成的返回值 (ResponseBodyAdvice) 做封装，支持自定义拦截器等
 - 支持 Context 扩展以实现例如从 Session 读取 userId 等属性填充到入参等功能
 
-## 示例
+## 已知问题
 
-以 CLEAN 架构实现的 UseCase 为例，每个 UseCase 有各自的 Input 和 Output，
-则可以实现自动注册路径并将 Input 作为参数，Output 作为返回值。
+- 不支持方法重载的选择，实际响应请求的 Bean 只能有且仅有一个和声明方法一致的处理方法
+- 尚未支持 PathParam
 
-```java
-package nxcloud.demo.domain.usecase.user;
+## 使用
 
-public class GetUserUseCase {
+示例代码使用 Kotlin 编写，Java 可自行转换，完整的示例程序可查看 `sample`
 
-    public Output execute(Input input) {
-        return new Output();
+### 示例服务 (实际响应请求处理的类)
+
+```kotlin
+interface UserService {
+
+    fun info(): User
+
+    fun rename(user: User): User
+
+    fun submit(user: User)
+
+    fun create(name: String, age: Int): User
+}
+
+@Component
+class UserServiceImpl : UserService {
+    override fun info(): User {
+        return User(
+            name = "info"
+        )
     }
 
-    static class Input {
-        private String userId;
-
-        public String getUserId() {
-            return userId;
-        }
-
-        public void setUserId(String userId) {
-            this.userId = userId;
-        }
+    override fun rename(user: User): User {
+        return User(
+            name = "rename: ${user.name}"
+        )
     }
 
-    static class Output {
-        private String userId;
+    override fun create(name: String, age: Int): User {
+        return User(
+            name = name,
+            age = age,
+        )
+    }
 
-        public String getUserId() {
-            return userId;
-        }
+    override fun submit(user: User) {
+        println(user)
+    }
+}
 
-        public void setUserId(String userId) {
-            this.userId = userId;
+data class User(
+    val name: String,
+    val age: Int = 0,
+)
+```
+
+### 启用自动注册
+
+添加依赖
+
+```kotlin
+// 自行替换相应的依赖方式
+implementation(project(":ext-spring-boot-starter-springmvc-automapping"))
+```
+
+SpringBootApplication 注解启动
+
+```kotlin
+@NXEnableSpringMvcAutoMapping
+@SpringBootApplication
+class AutoMappingSampleApp
+```
+
+### 协议声明
+
+协议声明默认请求方式为 `POST`，默认接收的 `Content-Type` 为 `application/json`。
+
+协议声明的方法为空方法即可，不需要任何参数和范围值，默认使用方法名作为映射路径，也可以在注解中自定义。
+
+```kotlin
+@SampleSessionRequired // 整个协议范围的自定义注解
+@AutoMappingContract(paths = ["/user"]) // 指定整个协议前缀
+interface UseCaseContract {
+
+    @AutoMappingContract(method = AutoMappingContract.Method.GET, beanType = UserService::class)
+    fun info()
+
+    /**
+     * 测试注解方式验证 Session
+     */
+    @SampleSessionRequired // 单个映射范围的自定义注解
+    @AutoMappingContract(beanType = UserService::class)
+    fun rename()
+
+    @AutoMappingContract(method = AutoMappingContract.Method.GET, beanType = UserService::class)
+    fun submit()
+
+    @AutoMappingContract(
+        paths = ["/test1", "/test2"], // 多个路径映射
+        method = AutoMappingContract.Method.GET, // 映射成 GET 请求
+        beanType = UserService::class,
+        beanMethod = "info" // 指定处理方法名
+    )
+    fun test()
+
+    @AutoMappingContract(
+        beanType = UserService::class,
+        consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE]
+    )
+    fun create()
+}
+```
+
+### 使用 ResponseBodyAdvice
+
+```kotlin
+@RestControllerAdvice
+class SampleResponseBodyWrapperAdvice(
+    private val autoMappingRequestParameterTypeBinding: AutoMappingRequestParameterTypeBinding, // 用于扩展判断的核心调用方法
+    private val objectMapper: ObjectMapper,
+) : ResponseBodyAdvice<Any> {
+
+    override fun supports(returnType: MethodParameter, converterType: Class<out HttpMessageConverter<*>>): Boolean {
+        return returnType.method
+            ?.let {
+                // 判断是否是自动映射的方法
+                // TODO 也可以加入其他自定义的例如包路径之类的判断条件
+                autoMappingRequestParameterTypeBinding.isSupportedMethod(it)
+            }
+            ?: false
+    }
+
+}
+```
+
+### 使用拦截器检查协议声明处的自定义注解
+
+```kotlin
+@Component
+class SampleSessionScopeInterceptor(
+    private val autoMappingRequestParameterTypeBinding: AutoMappingRequestParameterTypeBinding
+) : AsyncHandlerInterceptor {
+
+    override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
+        if (handler is HandlerMethod) {
+            println(
+                autoMappingRequestParameterTypeBinding.getAnnotation(
+                    handler.method,
+                    SampleSessionRequired::class.java,
+                    true,
+                )
+            )
         }
+        return true
     }
 }
 ```
 
-可自动为此 UseCase 注册如下 RequestMapping：
+### 自定义解析用于响应请求的方法名
 
-```java
-@RequestMapping(value = "/api/user/getUser", method = RequestMethod.POST)
-@ResponseBody
-GetUserUseCase.Output getUser(@RequestBody GetUserUseCase.Input input);
-```
-
-示例代码使用 Kotlin 编写，Java 可自行转换
-
-### 1. 定义一个注解用于标记需要自动映射的用例 (也可以基于父类映射, 但实际情况不应该是所有用例都映射)
+实现 AutoMappingContractDataConverter 扩展点
 
 ```kotlin
 /**
- * 默认用于标识自动映射的注解
+ * 将针对 UseCase 的自动映射处理方法名统一解析到 execute() 方法上
  */
-@Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.RUNTIME)
-@MustBeDocumented
-annotation class AutoMappingUseCase
-```
+@Bean
+protected fun abstractUseCaseAutoMappingContractDataConverter(): AutoMappingContractDataConverter {
+    return object : AutoMappingContractDataConverter {
+        override fun convert(data: AutoMappingContractData): AutoMappingContractData {
+            return data.copy(
+                beanMethod = "execute"
+            )
+        }
 
-### 2. 在启动类上添加注解 @EnableAutoMapping
-
-```kotlin
-@NXEnableSpringMvcAutoMapping(
-    basePackages = ["nxcloud.sample.api.domain"],
-    autoMappingAnnotations = [AutoMappingUseCase::class]
-)
-@SpringBootApplication
-class NXCloudSampleApiApplication
-
-fun main(args: Array<String>) {
-    runApplication<NXCloudSampleApiApplication>(*args)
-}
-```
-
-### 3. 实现自定义映射规则
-
-```kotlin
-@Configuration
-class CommonAutoMappingConfig {
-
-    @Bean
-    protected fun domainUseCaseAutoMappingRequestResolver(): AutoMappingRequestResolver {
-        return object : AutoMappingRequestResolver {
-
-            private var methodParameterMapping: MutableMap<Method, Class<*>> = mutableMapOf()
-
-            private val options = RequestMappingInfo.BuilderConfiguration()
-                .apply {
-                    patternParser = PathPatternParser()
-                }
-
-            override fun resolveMapping(bean: Any, beanName: String): List<RequestResolvedInfo> {
-                if (!AbstractUseCase::class.java.isAssignableFrom(bean::class.java)) {
-                    return emptyList()
-                }
-                val method = bean.javaClass.methods.first {
-                    it.name == "execute" && it.parameterCount == 1
-                }
-
-                val module = bean.javaClass.packageName
-                    .substringAfter("nxcloud.sample.api.domain.")
-                    .substringBefore(".")
-
-                // 需要把抽象类的抽象参数映射为当前 UseCase 的实际参数
-                methodParameterMapping[method] =
-                    Class.forName("${AopUtils.getTargetClass(bean).canonicalName}\$InputData")
-
-                return listOf(
-                    RequestResolvedInfo(
-                        RequestMappingInfo
-                            .paths("/api/${module}/${beanName.substringBeforeLast("UseCase")}")
-                            .consumes(MediaType.APPLICATION_JSON_VALUE)
-                            .methods(RequestMethod.POST)
-                            .options(options)
-                            .build(),
-                        bean,
-                        method
-                    ),
-                )
-            }
-
-            override fun resolveParameterClass(parameter: MethodParameter): Class<*> {
-                return methodParameterMapping[parameter.method!!]!!
-            }
-
-            override fun isSupportedMapping(bean: Any, beanName: String): Boolean {
-                return AbstractUseCase::class.java.isAssignableFrom(bean::class.java)
-            }
-
-            override fun isSupportedParameterClass(parameter: MethodParameter): Boolean {
-                return parameter.method
-                    ?.let {
-                        methodParameterMapping.containsKey(it)
-                    }
-                    ?: false
-            }
+        override fun isSupported(data: AutoMappingContractData): Boolean {
+            return AbstractUseCase::class.java.isAssignableFrom(data.beanType)
         }
     }
 }
 ```
+
+### 将响应请求的方法的抽象入参类型解析为具体的实现类的入参类型
+
+实现 AutoMappingRequestParameterTypeResolver 扩展点
+
+```kotlin
+/**
+ * 将 UseCase 的抽象入参类型解析为具体的实现类的入参类型
+ */
+@Bean
+protected fun abstractUseCaseAutoMappingRequestParameterTypeResolver(): AutoMappingRequestParameterTypeResolver {
+    return object : AutoMappingRequestParameterTypeResolver {
+        override fun isSupported(method: Method): Boolean {
+            return AbstractUseCase::class.java.isAssignableFrom(method.declaringClass)
+        }
+
+        override fun resolveParameterType(method: Method): Array<Class<*>> {
+            // 需要去掉 Spring 生成的 AOP 代理类名字后缀
+            val useCaseClassName =
+                StringUtils.substringBefore(method.declaringClass.canonicalName, ClassUtils.CGLIB_CLASS_SEPARATOR)
+            // 固定只有一个内部类参数
+            return arrayOf(Class.forName("${useCaseClassName}\$InputData"))
+        }
+    }
+}
+```
+
+### 注入自定义属性到请求参数的解析
+
+实现 AutoMappingRequestParameterInjector 扩展点
+
+用途：
+
+- 通过拦截器解析出用户 Session 信息例如 userId 保存到请求上下文中，最后在参数注入扩展点中注入到具体响应请求用例的参数中
