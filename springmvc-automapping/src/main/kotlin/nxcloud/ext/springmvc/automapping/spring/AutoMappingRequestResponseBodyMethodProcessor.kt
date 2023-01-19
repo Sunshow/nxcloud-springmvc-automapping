@@ -6,11 +6,13 @@ import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.method.support.ModelAndViewContainer
 import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice
 
 
 class AutoMappingRequestResponseBodyMethodProcessor(
-    converters: List<HttpMessageConverter<*>>
-) : RequestResponseBodyMethodProcessor(converters) {
+    converters: List<HttpMessageConverter<*>>,
+    responseBodyAdvices: List<ResponseBodyAdvice<out Any>>?,
+) : RequestResponseBodyMethodProcessor(converters, responseBodyAdvices) {
 
     @Autowired
     private lateinit var autoMappingRequestParameterTypeBinding: AutoMappingRequestParameterTypeBinding

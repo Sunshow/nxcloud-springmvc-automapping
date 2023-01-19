@@ -18,6 +18,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice
 
 @AutoConfiguration
 @ConditionalOnClass(RequestMappingHandlerMapping::class)
@@ -39,8 +40,9 @@ class NXSpringMvcAutoMappingAutoConfiguration {
     @ConditionalOnMissingBean(AutoMappingRequestResponseBodyMethodProcessor::class)
     protected fun autoMappingRequestResponseBodyMethodProcessor(
         converters: List<HttpMessageConverter<*>>,
+        responseBodyAdvices: List<ResponseBodyAdvice<out Any>>?,
     ): AutoMappingRequestResponseBodyMethodProcessor {
-        return AutoMappingRequestResponseBodyMethodProcessor(converters)
+        return AutoMappingRequestResponseBodyMethodProcessor(converters, responseBodyAdvices)
     }
 
     @Bean
