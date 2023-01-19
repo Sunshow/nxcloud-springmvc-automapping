@@ -14,6 +14,7 @@
 
 - 不支持方法重载的选择，实际响应请求的 Bean 只能有且仅有一个和声明方法一致的处理方法
 - 尚未支持 PathParam
+- 尚未处理非 RequestBody 请求时参数解析适配 SpringMvc Converter
 
 ## 使用
 
@@ -126,7 +127,8 @@ interface UseCaseContract {
 
 即直接在响应请求的 Bean 类型上加注解解析的场景，仅推荐用于测试场景，参见 `SampleAutoMappingBeanRequestResolver` 实现。
 
-因这种方式如果要实现生产环境的路径映射不可避免的需要侵入业务代码，如确实有需要也可以通过自定义注解加上 `AutoMappingBeanRequestResolver` 扩展点封装实现自定义需求。
+因这种方式如果要实现生产环境的路径映射不可避免的需要侵入业务代码，如确实有需要也可以通过自定义注解加上 `AutoMappingBeanRequestResolver`
+扩展点封装实现自定义需求。
 
 ### 通过配置文件映射 (未实现)
 
@@ -234,3 +236,48 @@ protected fun abstractUseCaseAutoMappingRequestParameterTypeResolver(): AutoMapp
 用途：
 
 - 通过拦截器解析出用户 Session 信息例如 userId 保存到请求上下文中，最后在参数注入扩展点中注入到具体响应请求用例的参数中
+
+```kotlin
+    /**
+ * 注入 Front memberId
+ */
+@Bean
+protected fun frontMemberIdAutoMappingRequestParameterInjector(
+    autoMappingRequestParameterTypeBinding: AutoMappingRequestParameterTypeBinding,
+): AutoMappingRequestParameterInjector {
+    return object : AutoMappingRequestParameterInjector {
+        override fun inject(
+            parameterObj: Any,
+            parameter: MethodParameter,
+            resolvedParameterType: Class<*>,
+            webRequest: NativeWebRequest
+        ) {
+            try {
+                val field = parameterObj::class.java.getDeclaredField("memberId")
+                field.isAccessible = true
+                field.set(parameterObj, FrontRequestContextHolder.current().memberId)
+            } catch (e: NoSuchFieldException) {
+                // 忽略传递未知属性的情况
+                logger.info { "$parameter 声明了验证 FrontSession, 但未要求 memberId" }
+            }
+        }
+
+        override fun isSupported(
+            parameterObj: Any,
+            parameter: MethodParameter,
+            resolvedParameterType: Class<*>,
+            webRequest: NativeWebRequest
+        ): Boolean {
+            return parameter.method
+                ?.let {
+                    autoMappingRequestParameterTypeBinding.getAnnotation(
+                        it,
+                        FrontSessionRequired::class.java,
+                        true
+                    ) != null
+                }
+                ?: false
+        }
+    }
+}
+```

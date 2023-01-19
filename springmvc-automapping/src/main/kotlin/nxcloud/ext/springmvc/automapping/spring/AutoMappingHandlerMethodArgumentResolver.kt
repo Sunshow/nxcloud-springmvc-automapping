@@ -55,7 +55,7 @@ class AutoMappingHandlerMethodArgumentResolver : HandlerMethodArgumentResolver {
                 it.isSupported(parameterObj, parameter, parameterType, webRequest)
             }
             ?.onEach {
-                it.inject(parameterObj)
+                it.inject(parameterObj, parameter, parameterType, webRequest)
             }
 
         return parameterObj

@@ -11,7 +11,12 @@ interface AutoMappingRequestParameterInjector {
     /**
      * 注入属性
      */
-    fun inject(parameterObj: Any) {
+    fun inject(
+        parameterObj: Any,
+        parameter: MethodParameter,
+        resolvedParameterType: Class<*>,
+        webRequest: NativeWebRequest,
+    ) {
     }
 
     fun isSupported(

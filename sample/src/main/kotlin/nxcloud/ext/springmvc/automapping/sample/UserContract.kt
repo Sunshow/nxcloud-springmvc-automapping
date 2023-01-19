@@ -35,6 +35,15 @@ interface UseCaseContract {
         consumes = ["application/x-www-form-urlencoded"]
     )
     fun create()
+
+    @SampleSessionRequired
+    @AutoMappingContract(
+        paths = ["/rename1"],
+        beanType = UserService::class,
+        beanMethod = "rename",
+        consumes = ["application/x-www-form-urlencoded"],
+    )
+    fun testSetStringToInt()
 }
 
 @AutoMappingBean
@@ -75,7 +84,9 @@ class UserServiceImpl : UserService {
     }
 }
 
-data class User(
-    val name: String,
-    val age: Int = 0,
-)
+class User(
+    var name: String,
+    var age: Int = 0,
+) {
+    constructor() : this("empty")
+}

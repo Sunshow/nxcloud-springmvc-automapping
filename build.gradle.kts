@@ -14,7 +14,7 @@ plugins {
 
 allprojects {
     group = "nxcloud.foundation"
-    version = "0.2.0-SNAPSHOT"
+    version = "0.3.0-SNAPSHOT"
 
     repositories {
         mavenCentral()
@@ -131,7 +131,7 @@ subprojects {
     publishing {
 
         // 发布 release
-        version = "0.2.9"
+        version = "0.3.0"
 
         val sourcesJar by tasks.registering(Jar::class) {
             archiveClassifier.set("sources")
