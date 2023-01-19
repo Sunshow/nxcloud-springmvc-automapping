@@ -122,6 +122,16 @@ interface UseCaseContract {
 }
 ```
 
+### Bean 声明 (不推荐)
+
+即直接在响应请求的 Bean 类型上加注解解析的场景，仅推荐用于测试场景，参见 `SampleAutoMappingBeanRequestResolver` 实现。
+
+因这种方式如果要实现生产环境的路径映射不可避免的需要侵入业务代码，如确实有需要也可以通过自定义注解加上 `AutoMappingBeanRequestResolver` 扩展点封装实现自定义需求。
+
+### 通过配置文件映射 (未实现)
+
+可通过前文所述方式自行实现。
+
 ### 使用 ResponseBodyAdvice
 
 ```kotlin
