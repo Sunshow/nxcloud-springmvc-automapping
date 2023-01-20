@@ -14,7 +14,6 @@
 
 - 不支持方法重载的选择，实际响应请求的 Bean 只能有且仅有一个和声明方法一致的处理方法
 - 尚未支持 PathParam
-- 尚未处理非 RequestBody 请求时参数解析适配 SpringMvc Converter
 
 ## 使用
 

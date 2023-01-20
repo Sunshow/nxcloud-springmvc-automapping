@@ -2,13 +2,20 @@ package nxcloud.ext.springmvc.automapping.spi.impl
 
 import mu.KotlinLogging
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestParameterResolver
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.core.MethodParameter
+import org.springframework.core.convert.ConversionService
 import org.springframework.web.context.request.NativeWebRequest
 import javax.servlet.http.HttpServletRequest
 
 abstract class AbstractQueryParameterAutoMappingRequestParameterResolver : AutoMappingRequestParameterResolver {
 
     private val logger = KotlinLogging.logger {}
+
+    @Lazy
+    @Autowired
+    protected lateinit var conversionService: ConversionService
 
     override fun resolveParameter(
         parameter: MethodParameter,
@@ -28,9 +35,10 @@ abstract class AbstractQueryParameterAutoMappingRequestParameterResolver : AutoM
                 // 检查是否是数组
                 // TODO 暂未处理集合类的情况
                 if (field.type.isArray) {
-                    field.set(parameterObj, value)
+                    val array = value.map { conversionService.convert(it, field.type.componentType) }.toTypedArray()
+                    field.set(parameterObj, array)
                 } else {
-                    field.set(parameterObj, value[0])
+                    field.set(parameterObj, conversionService.convert(value[0], field.type))
                 }
             } catch (e: NoSuchFieldException) {
                 // 忽略传递未知属性的情况

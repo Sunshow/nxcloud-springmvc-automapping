@@ -4,8 +4,7 @@ import org.springframework.core.MethodParameter
 import org.springframework.web.context.request.NativeWebRequest
 import javax.servlet.http.HttpServletRequest
 
-class GetAutoMappingRequestParameterResolver
-    : AbstractQueryParameterAutoMappingRequestParameterResolver() {
+class GetAutoMappingRequestParameterResolver : AbstractQueryParameterAutoMappingRequestParameterResolver() {
 
     override fun isSupported(
         parameter: MethodParameter,
