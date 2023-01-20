@@ -1,6 +1,8 @@
 # nxcloud-springmvc-automapping
 
-自动将指定注解的类方法注册到 SpringMVC RequestMapping 用于 REST 访问
+自动将指定注解的接口/类方法注册到 SpringMVC RequestMapping 用于 REST 访问
+
+![image](https://img.shields.io/maven-central/v/net.sunshow.nxcloud/nxcloud-springmvc-automapping)
 
 ## 设计目标
 
@@ -71,7 +73,7 @@ data class User(
 
 ```kotlin
 // 自行替换相应的依赖方式
-implementation(project(":ext-spring-boot-starter-springmvc-automapping"))
+implementation("net.sunshow.nxcloud:nxcloud-ext-spring-boot-starter-springmvc-automapping:0.3.1")
 ```
 
 SpringBootApplication 注解启动

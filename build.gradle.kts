@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     java
+    signing
     `maven-publish`
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.allopen)
@@ -13,7 +14,7 @@ plugins {
 }
 
 allprojects {
-    group = "nxcloud.foundation"
+    group = "net.sunshow.nxcloud"
     version = "0.3.0-SNAPSHOT"
 
     repositories {
@@ -127,6 +128,7 @@ subprojects {
     }
 
     apply(plugin = "maven-publish")
+    apply(plugin = "signing")
 
     publishing {
 
@@ -138,6 +140,11 @@ subprojects {
             from(sourceSets.main.get().allSource)
         }
 
+        val javadocJar by tasks.registering(Jar::class) {
+            archiveClassifier.set("javadoc")
+            from(tasks.javadoc)
+        }
+
         publications {
             create<MavenPublication>("mavenJava") {
                 artifactId = "nxcloud-${project.name}"
@@ -145,6 +152,36 @@ subprojects {
                 from(components["java"])
 
                 artifact(sourcesJar.get())
+
+                artifact(javadocJar.get())
+
+                pom {
+                    name.set("NXCloud SpringMVC AutoMapping")
+                    description.set("A convenient library for auto registering SpringMVC RequestMappings")
+                    url.set("https://github.com/Sunshow/nxcloud-springmvc-automapping")
+                    properties.set(
+                        mapOf(
+                        )
+                    )
+                    licenses {
+                        license {
+                            name.set("The Apache License, Version 2.0")
+                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("sunshow")
+                            name.set("Sunshow")
+                            email.set("sunshow@gmail.com")
+                        }
+                    }
+                    scm {
+                        connection.set("https://github.com/Sunshow/nxcloud-springmvc-automapping")
+                        developerConnection.set("https://github.com/Sunshow/nxcloud-springmvc-automapping")
+                        url.set("https://github.com/Sunshow/nxcloud-springmvc-automapping")
+                    }
+                }
             }
         }
 
@@ -170,6 +207,10 @@ subprojects {
                 }
             }
         }
+    }
+
+    signing {
+        sign(publishing.publications["mavenJava"])
     }
 
 }
