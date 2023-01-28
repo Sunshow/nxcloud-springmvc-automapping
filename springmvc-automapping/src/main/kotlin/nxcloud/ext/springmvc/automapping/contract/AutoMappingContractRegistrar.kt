@@ -8,7 +8,6 @@ import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestParameterTypeB
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
-import org.springframework.context.annotation.Lazy
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
@@ -32,7 +31,6 @@ open class AutoMappingContractRegistrar(
     @Autowired
     private lateinit var autoMappingRequestParameterTypeBinding: AutoMappingRequestParameterTypeBinding
 
-    @Lazy
     @Autowired
     private lateinit var requestMappingHandlerMapping: RequestMappingHandlerMapping
 
