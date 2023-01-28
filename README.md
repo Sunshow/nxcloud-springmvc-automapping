@@ -282,3 +282,12 @@ protected fun frontMemberIdAutoMappingRequestParameterInjector(
     }
 }
 ```
+
+### 搭配 Shiro 权限验证注解使用
+
+1. 实现 `AnnotationResolver` 从 `AutoMappingRequestParameterTypeBinding` 中获取注解
+2. 继承 `AopAllianceAnnotationsAuthorizingMethodInterceptor` 自定义实现拦截器, 使用第 2 步实现的 `AnnotationResolver`
+3. 模仿 `AuthorizationAttributeSourceAdvisor` 自定义实现一个 Advisor 以增强自动映射的实际处理类, 并将第 2 步的实现作为
+   Advice 注入
+
+注意：需要保证 `NXSpringMvcAutoMappingAutoConfiguration` 在 Shiro 自动配置之前执行
