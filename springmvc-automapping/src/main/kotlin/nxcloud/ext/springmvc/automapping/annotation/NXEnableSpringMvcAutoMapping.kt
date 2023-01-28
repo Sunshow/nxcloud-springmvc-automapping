@@ -1,4 +1,4 @@
-package nxcloud.ext.springmvc.automapping.spring.boot.annotation
+package nxcloud.ext.springmvc.automapping.annotation
 
 import nxcloud.ext.springmvc.automapping.base.annotation.AutoMappingBean
 import org.springframework.context.annotation.Import

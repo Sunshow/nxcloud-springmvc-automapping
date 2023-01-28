@@ -1,4 +1,4 @@
-package nxcloud.ext.springmvc.automapping.spring.boot.annotation
+package nxcloud.ext.springmvc.automapping.annotation
 
 import mu.KotlinLogging
 import nxcloud.ext.springmvc.automapping.base.annotation.AutoMappingContract
