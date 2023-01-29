@@ -16,6 +16,7 @@
 
 - 不支持方法重载的选择，实际响应请求的 Bean 只能有且仅有一个和声明方法一致的处理方法
 - 尚未支持 PathParam
+- 尚未支持 Shiro 等框架（基于 Spring AOP 静态方法的注解增强，执行顺序在 InitializingBean 之前）
 
 ## 使用
 
@@ -73,7 +74,7 @@ data class User(
 
 ```kotlin
 // 自行替换相应的依赖方式
-implementation("net.sunshow.nxcloud:nxcloud-ext-spring-boot-starter-springmvc-automapping:0.3.1")
+implementation("net.sunshow.nxcloud:nxcloud-ext-spring-boot-starter-springmvc-automapping:{latest.version}")
 ```
 
 SpringBootApplication 注解启动
@@ -290,4 +291,4 @@ protected fun frontMemberIdAutoMappingRequestParameterInjector(
 3. 模仿 `AuthorizationAttributeSourceAdvisor` 自定义实现一个 Advisor 以增强自动映射的实际处理类, 并将第 2 步的实现作为
    Advice 注入
 
-注意：需要保证 `NXSpringMvcAutoMappingAutoConfiguration` 在 Shiro 自动配置之前执行
+注意：需要保证 `NXSpringMvcAutoMappingAutoConfiguration` 在 Shiro 自动配置之前执行, 尚未实现
