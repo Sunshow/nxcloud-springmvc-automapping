@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import nxcloud.ext.springmvc.automapping.spi.impl.FormUrlencodedAutoMappingRequestParameterResolver
 import nxcloud.ext.springmvc.automapping.spi.impl.GetAutoMappingRequestParameterResolver
 import nxcloud.ext.springmvc.automapping.spi.impl.JacksonAutoMappingRequestParameterResolver
+import nxcloud.ext.springmvc.automapping.spi.impl.PathVariableAutoMappingRequestParameterResolver
 import nxcloud.ext.springmvc.automapping.spring.AutoMappingHandlerMethodArgumentResolver
 import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestHandlerRegistrar
 import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestParameterTypeBinding
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.Order
 import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler
@@ -52,6 +54,7 @@ class NXSpringMvcAutoMappingAutoConfiguration {
         return AutoMappingRequestParameterTypeBinding()
     }
 
+    @Order(1003)
     @Bean
     @ConditionalOnClass(ObjectMapper::class)
     @ConditionalOnMissingBean(JacksonAutoMappingRequestParameterResolver::class)
@@ -59,16 +62,26 @@ class NXSpringMvcAutoMappingAutoConfiguration {
         return JacksonAutoMappingRequestParameterResolver(objectMapper)
     }
 
+    @Order(1002)
     @Bean
     @ConditionalOnMissingBean(FormUrlencodedAutoMappingRequestParameterResolver::class)
     protected fun formUrlencodedAutoMappingRequestParameterResolver(): FormUrlencodedAutoMappingRequestParameterResolver {
         return FormUrlencodedAutoMappingRequestParameterResolver()
     }
 
+    @Order(1001)
     @Bean
     @ConditionalOnMissingBean(GetAutoMappingRequestParameterResolver::class)
     protected fun getAutoMappingRequestParameterResolver(): GetAutoMappingRequestParameterResolver {
         return GetAutoMappingRequestParameterResolver()
+    }
+
+    // 需要先处理路径上的参数解析
+    @Order(1000)
+    @Bean
+    @ConditionalOnMissingBean(PathVariableAutoMappingRequestParameterResolver::class)
+    protected fun pathVariableAutoMappingRequestParameterResolver(): PathVariableAutoMappingRequestParameterResolver {
+        return PathVariableAutoMappingRequestParameterResolver()
     }
 
     @Configuration

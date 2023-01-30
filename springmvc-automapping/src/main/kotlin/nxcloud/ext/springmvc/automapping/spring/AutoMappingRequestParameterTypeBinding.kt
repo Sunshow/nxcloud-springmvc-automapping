@@ -7,6 +7,7 @@ import org.springframework.core.MethodParameter
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.ui.Model
 import org.springframework.ui.ModelMap
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo
 import java.lang.reflect.Method
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -31,7 +32,11 @@ open class AutoMappingRequestParameterTypeBinding {
     // 声明处类型缓存, 缓存声明接口或者Bean的类型, 便于后续找到原始的注解信息
     private val declaringMethodCache: MutableMap<Method, Method> = mutableMapOf()
 
-    fun registerBinding(method: Method, declaredMethod: Method?) {
+    // 缓存映射路径中包含的路径参数, 实现类似 Spring MVC 的 @PathVariable 的功能
+    // Method 对应的 Map<String, Set<String>> 中的 String 为映射路径的 pattern, Set<String> 为 pattern 中包含的路径参数
+    private val pathVariableCache: MutableMap<Method, Map<String, Set<String>>> = mutableMapOf()
+
+    fun registerBinding(method: Method, declaredMethod: Method?, mapping: RequestMappingInfo?) {
         if (bindingCache.containsKey(method)) {
             return
         }
@@ -51,6 +56,39 @@ open class AutoMappingRequestParameterTypeBinding {
 
         // 如果未指定声明处的方法, 直接使用最后处理的方法
         declaringMethodCache[method] = declaredMethod ?: method
+
+        // 解析 Path 中的路径参数
+        mapping
+            ?.also {
+                resolvePathParameters(declaringMethodCache[method]!!, it)
+                    ?.apply {
+                        if (isNotEmpty()) {
+                            if (this.size > 1) {
+                                throw IllegalStateException("Method ${declaringMethodCache[method]!!.name} has more than one path pattern, which is not supported")
+                            }
+                            pathVariableCache[method] = this
+                        }
+                    }
+            }
+    }
+
+    private fun resolvePathParameters(method: Method, mapping: RequestMappingInfo): Map<String, Set<String>>? {
+        val regex = """\{(.*?)}""".toRegex()
+        val patterns = mapping.pathPatternsCondition?.patterns ?: return null
+        return patterns
+            .map {
+                it.patternString
+            }
+            .associateWith { p ->
+                regex.findAll(p)
+                    .map {
+                        it.groupValues[1]
+                    }
+                    .toSet()
+            }
+            .filter {
+                it.value.isNotEmpty()
+            }
     }
 
     // 调用此方法时需要确保此方法一定是已经自动注册了的, 即原始映射缓存中一定存在
@@ -95,6 +133,11 @@ open class AutoMappingRequestParameterTypeBinding {
 
         val parameterType = parameter.parameterType
 
+        // 如果是 Path 参数, 需要支持处理
+        if (isSupportedPathVariable(parameter)) {
+            return true
+        }
+
         return resolveBinding(method, parameter)
             ?.let {
                 !parameterType.isPrimitive
@@ -106,5 +149,28 @@ open class AutoMappingRequestParameterTypeBinding {
                         && !ModelMap::class.java.isAssignableFrom(parameterType)
             }
             ?: false
+    }
+
+    fun isSupportedPathVariable(parameter: MethodParameter): Boolean {
+        return pathVariableCache[parameter.method!!]
+            ?.flatMap {
+                it.value
+            }
+            ?.contains(parameter.parameterName!!) == true
+    }
+
+    fun isSupportedPathVariable(parameter: MethodParameter, pattern: String): Boolean {
+        val method = parameter.method!!
+        if (!isSupportedMethod(method)) {
+            return false
+        }
+
+        return pathVariableCache[method]
+            ?.get(pattern)
+            ?.contains(parameter.parameterName!!) == true
+    }
+
+    fun getPathVariableNames(method: Method, pattern: String): Set<String>? {
+        return pathVariableCache[method]?.get(pattern)
     }
 }

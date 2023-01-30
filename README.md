@@ -15,7 +15,6 @@
 ## 已知问题
 
 - 不支持方法重载的选择，实际响应请求的 Bean 只能有且仅有一个和声明方法一致的处理方法
-- 尚未支持 PathParam
 - 尚未支持 Shiro 等框架（基于 Spring AOP 静态方法的注解增强，执行顺序在 InitializingBean 之前）
 
 ## 使用

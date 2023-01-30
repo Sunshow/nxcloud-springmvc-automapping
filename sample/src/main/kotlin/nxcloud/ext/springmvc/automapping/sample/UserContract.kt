@@ -44,6 +44,38 @@ interface UseCaseContract {
         consumes = ["application/x-www-form-urlencoded"],
     )
     fun testSetStringToInt()
+
+    @AutoMappingContract(
+        method = AutoMappingContract.Method.GET,
+        paths = ["/profile/{name}"],
+        beanType = UserService::class,
+        beanMethod = "create",
+        consumes = []
+    )
+    fun testPath()
+
+    @AutoMappingContract(
+        paths = ["/update/{name}"],
+        beanType = UserService::class,
+        beanMethod = "update",
+    )
+    fun testPathWithBody()
+
+    @AutoMappingContract(
+        method = AutoMappingContract.Method.GET,
+        paths = ["/rename/{name}"],
+        consumes = [],
+        beanType = UserService::class,
+        beanMethod = "rename",
+    )
+    fun testPathInObj()
+
+    @AutoMappingContract(
+        paths = ["/rename2/{name}"],
+        beanType = UserService::class,
+        beanMethod = "rename",
+    )
+    fun testPathInBody()
 }
 
 @AutoMappingBean
@@ -56,6 +88,8 @@ interface UserService {
     fun submit(user: User)
 
     fun create(name: String, age: Int): User
+
+    fun update(name: String, user: User): User
 }
 
 @Component
@@ -68,7 +102,8 @@ class UserServiceImpl : UserService {
 
     override fun rename(user: User): User {
         return User(
-            name = "rename: ${user.name}"
+            name = "rename: ${user.name}",
+            age = user.age,
         )
     }
 
@@ -79,13 +114,20 @@ class UserServiceImpl : UserService {
         )
     }
 
+    override fun update(name: String, user: User): User {
+        return User(
+            name = "update: $name, ${user.name}",
+            age = user.age,
+        )
+    }
+
     override fun submit(user: User) {
         println(user)
     }
 }
 
 class User(
-    var name: String,
+    var name: String? = null,
     var age: Int = 0,
 ) {
     constructor() : this("empty")

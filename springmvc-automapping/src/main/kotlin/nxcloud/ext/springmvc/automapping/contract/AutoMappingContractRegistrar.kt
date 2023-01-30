@@ -77,6 +77,7 @@ open class AutoMappingContractRegistrar(
                 autoMappingRequestParameterTypeBinding.registerBinding(
                     registration.method,
                     registration.declaringMethod,
+                    registration.mapping,
                 )
                 logger.info {
                     "注册自动映射: ${registration.bean.javaClass.canonicalName} - ${registration.mapping}"
