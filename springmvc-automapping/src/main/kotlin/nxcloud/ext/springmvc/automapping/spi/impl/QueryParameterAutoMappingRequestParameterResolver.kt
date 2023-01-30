@@ -12,16 +12,33 @@ import org.springframework.web.context.request.RequestAttributes
 import org.springframework.web.servlet.HandlerMapping
 import javax.servlet.http.HttpServletRequest
 
-abstract class AbstractQueryParameterAutoMappingRequestParameterResolver : AutoMappingRequestParameterResolver {
+class QueryParameterAutoMappingRequestParameterResolver : AutoMappingRequestParameterResolver {
 
     private val logger = KotlinLogging.logger {}
 
     @Lazy
     @Autowired
-    protected lateinit var conversionService: ConversionService
+    private lateinit var conversionService: ConversionService
 
     @Autowired
     private lateinit var autoMappingRequestParameterTypeBinding: AutoMappingRequestParameterTypeBinding
+
+    override fun isSupported(
+        parameter: MethodParameter,
+        resolvedParameterType: Class<*>,
+        webRequest: NativeWebRequest
+    ): Boolean {
+        val servletRequest = webRequest.getNativeRequest(HttpServletRequest::class.java)!!
+
+        return servletRequest.method.uppercase() == "GET"
+                || (
+                servletRequest.method.uppercase() == "POST"
+                        && (
+                        servletRequest.contentType.isNullOrBlank()
+                                || servletRequest.contentType!!.startsWith("application/x-www-form-urlencoded")
+                        )
+                )
+    }
 
     override fun resolveParameter(
         parameter: MethodParameter,

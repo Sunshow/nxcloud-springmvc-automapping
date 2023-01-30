@@ -76,6 +76,13 @@ interface UseCaseContract {
         beanMethod = "rename",
     )
     fun testPathInBody()
+
+    @AutoMappingContract(
+        consumes = [],
+        beanType = UserService::class,
+        beanMethod = "rename",
+    )
+    fun rename3()
 }
 
 @AutoMappingBean
