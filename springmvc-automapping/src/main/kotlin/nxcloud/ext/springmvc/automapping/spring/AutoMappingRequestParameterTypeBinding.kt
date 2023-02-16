@@ -66,7 +66,11 @@ open class AutoMappingRequestParameterTypeBinding {
                             if (this.size > 1) {
                                 throw IllegalStateException("Method ${declaringMethodCache[method]!!.name} has more than one path pattern, which is not supported")
                             }
-                            pathVariableCache[method] = this
+                            pathVariableCache[method] = if (pathVariableCache.containsKey(method)) {
+                                pathVariableCache[method]!! + this
+                            } else {
+                                this
+                            }
                         }
                     }
             }
