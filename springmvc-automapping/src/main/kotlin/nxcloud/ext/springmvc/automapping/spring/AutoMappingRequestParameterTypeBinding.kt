@@ -156,6 +156,10 @@ open class AutoMappingRequestParameterTypeBinding {
     }
 
     fun isSupportedPathVariable(parameter: MethodParameter): Boolean {
+        // 对于例如像执行方法是由父类代理增强出来的情况, 参数名获取不到, 这种情况不做支持, 实际业务一般不需要关心
+        if (parameter.parameterName == null) {
+            return false
+        }
         return pathVariableCache[parameter.method!!]
             ?.flatMap {
                 it.value
@@ -166,6 +170,11 @@ open class AutoMappingRequestParameterTypeBinding {
     fun isSupportedPathVariable(parameter: MethodParameter, pattern: String): Boolean {
         val method = parameter.method!!
         if (!isSupportedMethod(method)) {
+            return false
+        }
+
+        // 对于例如像执行方法是由父类代理增强出来的情况, 参数名获取不到, 这种情况不做支持, 实际业务一般不需要关心
+        if (parameter.parameterName == null) {
             return false
         }
 
