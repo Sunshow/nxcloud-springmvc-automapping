@@ -1,9 +1,11 @@
 package nxcloud.ext.springmvc.automapping.spi.impl
 
 import mu.KotlinLogging
+import nxcloud.ext.springmvc.automapping.spi.AutoMappingFieldArgumentResolver
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestParameterResolver
 import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestParameterTypeBinding
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Lazy
 import org.springframework.core.MethodParameter
 import org.springframework.core.convert.ConversionService
@@ -16,12 +18,18 @@ class QueryParameterAutoMappingRequestParameterResolver : AutoMappingRequestPara
 
     private val logger = KotlinLogging.logger {}
 
+    @Autowired
+    private lateinit var applicationContext: ApplicationContext
+
     @Lazy
     @Autowired
     private lateinit var conversionService: ConversionService
 
     @Autowired
     private lateinit var autoMappingRequestParameterTypeBinding: AutoMappingRequestParameterTypeBinding
+
+    @Autowired(required = false)
+    private var fieldArgumentResolverList: List<AutoMappingFieldArgumentResolver>? = null
 
     override fun isSupported(
         parameter: MethodParameter,
@@ -69,23 +77,35 @@ class QueryParameterAutoMappingRequestParameterResolver : AutoMappingRequestPara
                 }
             }
 
-        parameters.forEach { (key, value) ->
-            try {
-                val field = resolvedParameterType.getDeclaredField(key)
-                field.isAccessible = true
-                // 检查是否是数组
-                // TODO 暂未处理集合类的情况
-                if (field.type.isArray) {
-                    val array = value.map { conversionService.convert(it, field.type.componentType) }.toTypedArray()
-                    field.set(parameterObj, array)
+        resolvedParameterType.declaredFields
+            .onEach { field ->
+                val fieldName = field.name
+                if (parameters.containsKey(fieldName)) {
+                    val value = parameters[fieldName] ?: return@onEach
+                    // 请求参数有值 则填充
+                    field.isAccessible = true
+
+                    // 检查是否是数组
+                    // TODO 暂未处理集合类的情况
+                    if (field.type.isArray) {
+                        val array = value.map { conversionService.convert(it, field.type.componentType) }.toTypedArray()
+                        field.set(parameterObj, array)
+                    } else {
+                        field.set(parameterObj, conversionService.convert(value[0], field.type))
+                    }
                 } else {
-                    field.set(parameterObj, conversionService.convert(value[0], field.type))
+                    // 请求参数中未包含同名属性, 尝试是否自定义解析
+                    fieldArgumentResolverList
+                        ?.firstOrNull {
+                            it.supportsParameter(field, parameterObj, parameter, resolvedParameterType, webRequest)
+                        }
+                        ?.resolveArgument(field, parameterObj, parameter, resolvedParameterType, webRequest)
+                        ?.apply {
+                            field.isAccessible = true
+                            field.set(parameterObj, this)
+                        }
                 }
-            } catch (e: NoSuchFieldException) {
-                // 忽略传递未知属性的情况
-                logger.debug { "No such field: $key" }
             }
-        }
 
         return parameterObj
     }
