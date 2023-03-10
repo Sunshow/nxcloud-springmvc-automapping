@@ -83,6 +83,20 @@ interface UseCaseContract {
         beanMethod = "rename",
     )
     fun rename3()
+
+    @AutoMappingContract(
+        consumes = [],
+        method = AutoMappingContract.Method.GET,
+        beanType = UserService::class,
+    )
+    fun search()
+}
+
+class SearchDomain constructor(
+    val user: User,
+    val page: Int,
+) {
+    constructor() : this(User(), 0)
 }
 
 @AutoMappingBean
@@ -97,6 +111,8 @@ interface UserService {
     fun create(name: String, age: Int): User
 
     fun update(name: String, user: User): User
+
+    fun search(searchDomain: SearchDomain): User
 }
 
 @Component
@@ -130,6 +146,10 @@ class UserServiceImpl : UserService {
 
     override fun submit(user: User) {
         println(user)
+    }
+
+    override fun search(searchDomain: SearchDomain): User {
+        return searchDomain.user;
     }
 }
 
