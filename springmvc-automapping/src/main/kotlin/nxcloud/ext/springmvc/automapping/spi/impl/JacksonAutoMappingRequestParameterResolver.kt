@@ -37,7 +37,20 @@ class JacksonAutoMappingRequestParameterResolver(
     ): Any? {
         val body = getRequestBody(webRequest)
 
-        val parameterObj = objectMapper.readValue(body, resolvedParameterType)
+        val parameterObj = if (resolvedParameterType == String::class.java) {
+            body
+        } else {
+            if (body.isBlank()) {
+                resolvedParameterType.getDeclaredConstructor().newInstance()
+            } else {
+                try {
+                    objectMapper.readValue(body, resolvedParameterType)
+                } catch (e: IOException) {
+                    logger.error(e) { "解析请求体失败" }
+                    throw e
+                }
+            }
+        }
 
         // 填充属性
         val parameters = mutableMapOf<String, String>()
