@@ -1,7 +1,8 @@
 package nxcloud.ext.springmvc.automapping.spi.impl
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
+import jakarta.servlet.http.HttpServletRequest
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestParameterResolver
 import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestParameterTypeBinding
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,7 +14,6 @@ import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.context.request.RequestAttributes
 import org.springframework.web.servlet.HandlerMapping
 import java.io.IOException
-import javax.servlet.http.HttpServletRequest
 
 class JacksonAutoMappingRequestParameterResolver(
     private val objectMapper: ObjectMapper,

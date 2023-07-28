@@ -1,10 +1,10 @@
 dependencies {
     api(project(":springmvc-automapping-base"))
 
-    compileOnly(libs.jakarta.annotation.api)
-    compileOnly(libs.jakarta.servlet.api)
+    compileOnly("jakarta.annotation:jakarta.annotation-api")
+    compileOnly("jakarta.servlet:jakarta.servlet-api")
 
-    compileOnly(libs.spring.context)
-    compileOnly(libs.spring.mvc)
-    compileOnly(libs.jackson.databind)
+    compileOnly("org.springframework:spring-context")
+    compileOnly("org.springframework:spring-webmvc")
+    compileOnly("com.fasterxml.jackson.core:jackson-databind")
 }

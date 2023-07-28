@@ -1,6 +1,7 @@
 package nxcloud.ext.springmvc.automapping.spi.impl
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
+import jakarta.servlet.http.HttpServletRequest
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingFieldArgumentResolver
 import nxcloud.ext.springmvc.automapping.spi.AutoMappingRequestParameterResolver
 import nxcloud.ext.springmvc.automapping.spring.AutoMappingRequestParameterTypeBinding
@@ -12,7 +13,6 @@ import org.springframework.core.convert.ConversionService
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.context.request.RequestAttributes
 import org.springframework.web.servlet.HandlerMapping
-import javax.servlet.http.HttpServletRequest
 
 class QueryParameterAutoMappingRequestParameterResolver : AutoMappingRequestParameterResolver {
 

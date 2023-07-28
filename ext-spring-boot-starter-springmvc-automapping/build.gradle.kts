@@ -1,7 +1,7 @@
 dependencies {
     api(project(":springmvc-automapping"))
-    api(libs.springboot.autoconfigure)
+    api("org.springframework.boot:spring-boot-autoconfigure")
 
-    compileOnly(libs.spring.mvc)
-    compileOnly(libs.jackson.databind)
+    compileOnly("org.springframework:spring-webmvc")
+    compileOnly("com.fasterxml.jackson.core:jackson-databind")
 }

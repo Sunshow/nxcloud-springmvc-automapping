@@ -1,7 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     java
     signing
@@ -9,13 +8,12 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.allopen)
     alias(libs.plugins.kotlin.noarg)
-    alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.springboot) apply false
 }
 
 allprojects {
     group = "net.sunshow.nxcloud"
-    version = "0.3.0-SNAPSHOT"
+    version = "1.0.0-SNAPSHOT"
 
     repositories {
         mavenCentral()
@@ -72,20 +70,20 @@ subprojects {
 
     configure<JavaPluginExtension> {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
+            languageVersion.set(JavaLanguageVersion.of(17))
         }
     }
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_1_8.toString()
+            jvmTarget = JavaVersion.VERSION_17.toString()
             freeCompilerArgs = listOf(
                 "-Xjvm-default=all",
             )
         }
     }
 
-    val testJavaVersion = System.getProperty("test.java.version", "11").toInt()
+    val testJavaVersion = System.getProperty("test.java.version", "17").toInt()
 
     tasks.withType<Test> {
         useJUnitPlatform()
@@ -108,11 +106,17 @@ subprojects {
     }
 
     tasks.withType<JavaCompile> {
-        sourceCompatibility = JavaVersion.VERSION_1_8.toString()
-        targetCompatibility = JavaVersion.VERSION_1_8.toString()
+        sourceCompatibility = JavaVersion.VERSION_17.toString()
+        targetCompatibility = JavaVersion.VERSION_17.toString()
+    }
+
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor(0, "seconds")
     }
 
     dependencies {
+        implementation(platform(rootProject.libs.bom.springboot))
+        implementation("org.slf4j:slf4j-api")
         implementation(rootProject.libs.kotlin.logging.jvm)
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.junit.jupiter:junit-jupiter-api")
@@ -133,7 +137,7 @@ subprojects {
     publishing {
 
         // 发布 release
-        // version = "0.3.7"
+        version = "1.0.0"
 
         val sourcesJar by tasks.registering(Jar::class) {
             archiveClassifier.set("sources")
@@ -213,24 +217,6 @@ subprojects {
         sign(publishing.publications["mavenJava"])
     }
 
-}
-
-subprojects {
-    if (project.name != "sample") {
-        return@subprojects
-    }
-    apply(plugin = "io.spring.dependency-management")
-
-    dependencyManagement {
-        resolutionStrategy {
-            cacheChangingModulesFor(0, "seconds")
-            cacheDynamicVersionsFor(0, "seconds")
-        }
-
-        imports {
-            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-        }
-    }
 }
 
 tasks.wrapper {

@@ -1,6 +1,6 @@
 package nxcloud.ext.springmvc.automapping.annotation
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import nxcloud.ext.springmvc.automapping.base.annotation.AutoMappingContract
 import nxcloud.ext.springmvc.automapping.context.AutoMappingContext
 import nxcloud.ext.springmvc.automapping.contract.AutoMappingContractData

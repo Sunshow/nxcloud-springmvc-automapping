@@ -1,44 +1,18 @@
 [versions]
-org-jetbrains-kotlin = "1.7.10"
-org-springframework = { prefer = "5.3.24" }
-org-springframework-boot = "2.7.7"
-com-vanniktech-gradle-maven-publish = "0.22.0"
-org-slf4j = { prefer = "1.7.36" }
-kotlin-logging-jvm = "2.1.23"
-ch-qos-logback = { prefer = "1.4.4" }
-io-spring-dependency-management = "1.1.0"
-nxcloud-foundation-core = "0.2.8"
-jakarta-annotation = "1.3.5"
-jakarta-servlet = "4.0.4"
-com-fasterxml-jackson-core = { prefer = "2.14.1" }
-org-apache-shiro = "1.11.0"
+org-jetbrains-kotlin = "1.9.0"
+org-springframework-boot = "3.1.2"
+kotlin-logging-jvm = "5.0.1"
+nxcloud-foundation-core = "0.5.0"
 
 [libraries]
-slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "org-slf4j" }
 javax-jaxb = { module = "javax.xml.bind:jaxb-api", version = "2.3.1" }
 bom-springboot = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "org-springframework-boot" }
-spring-context = { module = "org.springframework:spring-context", version.ref = "org-springframework" }
-spring-mvc = { module = "org.springframework:spring-webmvc", version.ref = "org-springframework" }
-springboot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "org-springframework-boot" }
-springboot-test = { module = "org.springframework.boot:spring-boot-test", version.ref = "org-springframework-boot" }
-springboot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "org-springframework-boot" }
-springboot-starter-logging = { module = "org.springframework.boot:spring-boot-starter-logging", version.ref = "org-springframework-boot" }
-springboot-starter-aop = { module = "org.springframework.boot:spring-boot-starter-aop", version.ref = "org-springframework-boot" }
-kotlin-logging-jvm = { module = "io.github.microutils:kotlin-logging-jvm", version.ref = "kotlin-logging-jvm" }
-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback" }
+kotlin-logging-jvm = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlin-logging-jvm" }
 nxcloud-core-spring-boot-autoconfigure = { module = "nxcloud.foundation:nxcloud-core-spring-boot-autoconfigure", version.ref = "nxcloud-foundation-core" }
 nxcloud-core-spring-boot-starter = { module = "nxcloud.foundation:nxcloud-core-spring-boot-starter", version.ref = "nxcloud-foundation-core" }
-jakarta-annotation-api = { module = "jakarta.annotation:jakarta.annotation-api", version.ref = "jakarta-annotation" }
-jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "jakarta-servlet" }
-jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "com-fasterxml-jackson-core" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "com-fasterxml-jackson-core" }
-jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "com-fasterxml-jackson-core" }
-shiro-spring-boot-web-starter = { module = "org.apache.shiro:shiro-spring-boot-web-starter", version.ref = "org-apache-shiro" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin" }
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "org-jetbrains-kotlin" }
 kotlin-noarg = { id = "org.jetbrains.kotlin.plugin.noarg", version.ref = "org-jetbrains-kotlin" }
 springboot = { id = "org.springframework.boot", version.ref = "org-springframework-boot" }
-mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "com-vanniktech-gradle-maven-publish" }
-spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "io-spring-dependency-management" }

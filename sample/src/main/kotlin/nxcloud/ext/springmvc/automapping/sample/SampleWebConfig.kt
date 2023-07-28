@@ -1,5 +1,6 @@
 package nxcloud.ext.springmvc.automapping.sample
 
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.MethodParameter
@@ -9,7 +10,6 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import javax.servlet.http.HttpServletRequest
 
 @Configuration
 class SampleWebConfig : WebMvcConfigurer {
