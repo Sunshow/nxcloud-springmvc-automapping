@@ -91,4 +91,9 @@ open class AutoMappingContractRegistrar(
             AutoMappingContract.Method.GET -> arrayOf(RequestMethod.GET)
         }
     }
+
+    fun getContractData():List<AutoMappingContractData>{
+        return contractData
+    }
+
 }

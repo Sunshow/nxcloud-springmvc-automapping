@@ -18,6 +18,8 @@ annotation class AutoMappingContract(
     // 响应处理的Bean方法名, 暂不支持多个同名方法
     val beanMethod: String = "",
     val consumes: Array<String> = ["application/json"],
+    // OpenApi 接口名称
+    val summary: String = "",
 ) {
     enum class Method {
         GET,

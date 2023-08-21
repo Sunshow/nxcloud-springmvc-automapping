@@ -150,6 +150,7 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar, Enviro
         }
 
         val consumes = methodAttribute.getStringArray("consumes")
+        val summary = methodAttribute.getString("summary")
 
         // 合并映射路径
         return typePaths
@@ -170,6 +171,7 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar, Enviro
                     beanType,
                     beanMethod,
                     consumes,
+                    summary,
                 )
             }
     }

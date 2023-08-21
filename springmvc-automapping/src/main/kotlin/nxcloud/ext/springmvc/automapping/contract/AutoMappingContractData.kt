@@ -16,6 +16,8 @@ data class AutoMappingContractData(
     val beanMethod: String = "",
     // 消费 Content-Type 类型
     val consumes: Array<String>,
+    // 接口名称
+    val summary: String = "",
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -28,6 +30,7 @@ data class AutoMappingContractData(
         if (beanType != other.beanType) return false
         if (beanMethod != other.beanMethod) return false
         if (!consumes.contentEquals(other.consumes)) return false
+        if (summary != other.summary) return false
 
         return true
     }
@@ -38,6 +41,7 @@ data class AutoMappingContractData(
         result = 31 * result + beanType.hashCode()
         result = 31 * result + beanMethod.hashCode()
         result = 31 * result + consumes.contentHashCode()
+        result = 31 * result + summary.hashCode()
         return result
     }
 }
