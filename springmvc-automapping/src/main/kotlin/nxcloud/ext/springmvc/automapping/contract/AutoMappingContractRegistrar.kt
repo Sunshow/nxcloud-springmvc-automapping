@@ -92,7 +92,7 @@ open class AutoMappingContractRegistrar(
         }
     }
 
-    fun getContractData():List<AutoMappingContractData>{
+    fun getContractData(): List<AutoMappingContractData> {
         return contractData
     }
 
