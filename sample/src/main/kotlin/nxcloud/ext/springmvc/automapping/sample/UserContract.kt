@@ -12,6 +12,12 @@ interface UseCaseContract {
     @AutoMappingContract(method = AutoMappingContract.Method.GET, beanType = UserService::class)
     fun info()
 
+    @AutoMappingContract(
+        beanType = SampleUseCase::class,
+        summary = "测试用例映射",
+    )
+    fun sample()
+
     /**
      * 测试注解方式验证 Session
      */

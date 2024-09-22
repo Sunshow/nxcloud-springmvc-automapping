@@ -29,6 +29,7 @@ class SampleAutoMappingBeanRequestResolver : AutoMappingBeanRequestResolver {
                     .methods(RequestMethod.POST)
                     .options(options)
                     .build(),
+                beanType = User::class.java,
                 bean,
                 bean.javaClass.getMethod("rename", User::class.java)
             ),
@@ -40,6 +41,7 @@ class SampleAutoMappingBeanRequestResolver : AutoMappingBeanRequestResolver {
                     .methods(RequestMethod.POST)
                     .options(options)
                     .build(),
+                beanType = User::class.java,
                 bean,
                 bean.javaClass.getMethod("info")
             ),
@@ -51,6 +53,7 @@ class SampleAutoMappingBeanRequestResolver : AutoMappingBeanRequestResolver {
                     .methods(RequestMethod.POST)
                     .options(options)
                     .build(),
+                beanType = User::class.java,
                 bean,
                 bean.javaClass.getMethod("submit", User::class.java)
             ),

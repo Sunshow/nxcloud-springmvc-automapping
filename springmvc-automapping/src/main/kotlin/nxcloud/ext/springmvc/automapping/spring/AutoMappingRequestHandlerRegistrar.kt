@@ -45,11 +45,7 @@ class AutoMappingRequestHandlerRegistrar : BeanPostProcessor {
                                 registration.bean,
                                 registration.method
                             )
-                            autoMappingRequestParameterTypeBinding.registerBinding(
-                                registration.method,
-                                registration.declaringMethod,
-                                registration.mapping
-                            )
+                            autoMappingRequestParameterTypeBinding.registerBinding(registration)
                             logger.info {
                                 "注册自动映射: ${bean.javaClass.canonicalName} - ${registration.mapping}"
                             }

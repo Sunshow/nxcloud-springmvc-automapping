@@ -60,6 +60,7 @@ open class AutoMappingContractRegistrar(
                         .methods(*convertMethods(data))
                         .options(options)
                         .build(),
+                    data.beanType,
                     bean,
                     bean.javaClass.methods
                         .first {
@@ -74,11 +75,7 @@ open class AutoMappingContractRegistrar(
                     registration.bean,
                     registration.method
                 )
-                autoMappingRequestParameterTypeBinding.registerBinding(
-                    registration.method,
-                    registration.declaringMethod,
-                    registration.mapping,
-                )
+                autoMappingRequestParameterTypeBinding.registerBinding(registration)
                 logger.info {
                     "注册自动映射: ${registration.bean.javaClass.canonicalName} - ${registration.mapping}"
                 }

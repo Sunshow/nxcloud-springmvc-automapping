@@ -2,12 +2,13 @@
 org-jetbrains-kotlin = "1.9.0"
 org-springframework-boot = "3.1.2"
 kotlin-logging-jvm = "5.0.1"
-nxcloud-foundation-core = "0.5.0"
+nxcloud-foundation-core = "0.6.0"
 
 [libraries]
 javax-jaxb = { module = "javax.xml.bind:jaxb-api", version = "2.3.1" }
 bom-springboot = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "org-springframework-boot" }
 kotlin-logging-jvm = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlin-logging-jvm" }
+nxcloud-core-base = { module = "net.sunshow.nxcloud:nxcloud-core-base", version.ref = "nxcloud-foundation-core" }
 nxcloud-core-spring-boot-autoconfigure = { module = "nxcloud.foundation:nxcloud-core-spring-boot-autoconfigure", version.ref = "nxcloud-foundation-core" }
 nxcloud-core-spring-boot-starter = { module = "nxcloud.foundation:nxcloud-core-spring-boot-starter", version.ref = "nxcloud-foundation-core" }
 

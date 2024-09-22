@@ -62,6 +62,7 @@ subprojects {
     }
 
     noArg {
+        annotation("nxcloud.foundation.core.lang.annotation.NoArgs")
     }
 
     tasks.withType<JavaCompile> {
@@ -137,7 +138,7 @@ subprojects {
     publishing {
 
         // 发布 release
-        version = "1.1.0"
+        version = "1.2.0"
 
         val sourcesJar by tasks.registering(Jar::class) {
             archiveClassifier.set("sources")
