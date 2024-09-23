@@ -11,6 +11,7 @@ import org.springframework.core.MethodParameter
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.ui.Model
 import org.springframework.ui.ModelMap
+import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo
 import java.lang.reflect.Method
 
@@ -140,7 +141,15 @@ open class AutoMappingRequestParameterTypeBinding {
     }
 
     fun isSupportedParameterType(parameter: MethodParameter): Boolean {
-        val method = parameter.method!!
+        // val method = parameter.method!!
+        // 兼容 springframework 6.1.9 之后的改动, 通过 this$0 获取 HandlerMethod, 直接获取 method 会得到抽象代理类的方法
+        val handlerMethod = parameter::class.java
+            .getDeclaredField("this$0")
+            .apply {
+                trySetAccessible()
+            }
+            .get(parameter) as HandlerMethod
+        val method = handlerMethod.method
         if (!isSupportedMethod(method)) {
             return false
         }
@@ -153,7 +162,7 @@ open class AutoMappingRequestParameterTypeBinding {
         }
 
         return resolveBinding(method, parameter)
-            ?.let {
+            .let {
                 !parameterType.isPrimitive
                         && !parameterType.canonicalName.startsWith("java.")
                         && !HttpServletRequest::class.java.isAssignableFrom(parameterType)
@@ -162,7 +171,6 @@ open class AutoMappingRequestParameterTypeBinding {
                         && !Model::class.java.isAssignableFrom(parameterType)
                         && !ModelMap::class.java.isAssignableFrom(parameterType)
             }
-            ?: false
     }
 
     fun isSupportedPathVariable(parameter: MethodParameter): Boolean {

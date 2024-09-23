@@ -39,7 +39,6 @@ class AutoMappingHandlerMethodArgumentResolver : HandlerMethodArgumentResolver {
         // 拿到实际的类型
         val parameterType =
             autoMappingRequestParameterTypeBinding.resolveBinding(parameter.method!!, parameter)
-                ?: return null
 
         // 从请求中解析出参数并构建相应的对象
         val parameterObj = autoMappingRequestParameterResolvers
