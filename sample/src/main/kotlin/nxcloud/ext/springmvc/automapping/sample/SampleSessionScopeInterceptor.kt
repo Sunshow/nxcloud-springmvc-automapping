@@ -16,7 +16,7 @@ class SampleSessionScopeInterceptor(
         if (handler is HandlerMethod) {
             println(
                 autoMappingRequestParameterTypeBinding.getAnnotation(
-                    handler.method,
+                    handler,
                     SampleSessionRequired::class.java,
                     true,
                 )

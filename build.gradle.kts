@@ -138,7 +138,7 @@ subprojects {
     publishing {
 
         // 发布 release
-        version = "1.3.2"
+        version = "1.3.3"
 
         val sourcesJar by tasks.registering(Jar::class) {
             archiveClassifier.set("sources")

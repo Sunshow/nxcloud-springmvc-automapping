@@ -70,7 +70,7 @@ open class AutoMappingRequestParameterTypeBinding {
 
         // 解析 Path 中的路径参数
         mapping
-            ?.also {
+            .also {
                 resolvePathParameters(declaringMethodCache[method]!!, it)
                     ?.apply {
                         if (isNotEmpty()) {
@@ -117,11 +117,11 @@ open class AutoMappingRequestParameterTypeBinding {
         return parameterTypes[parameter.parameterIndex]
     }
 
-    fun <T : Annotation> getAnnotation(method: Method, annotationType: Class<T>): T? {
+    private fun <T : Annotation> getAnnotation(method: Method, annotationType: Class<T>): T? {
         return this.getAnnotation(method, annotationType, false)
     }
 
-    fun <T : Annotation> getAnnotation(
+    private fun <T : Annotation> getAnnotation(
         method: Method,
         annotationType: Class<T>,
         searchClassType: Boolean
@@ -135,6 +135,31 @@ open class AutoMappingRequestParameterTypeBinding {
             annotation = AnnotationUtils.findAnnotation(declaringMethod.declaringClass, annotationType)
         }
         return annotation
+    }
+
+    fun <T : Annotation> getAnnotation(handlerMethod: HandlerMethod, annotationType: Class<T>): T? {
+        return this.getAnnotation(handlerMethod, annotationType, false)
+    }
+
+    fun <T : Annotation> getAnnotation(
+        handlerMethod: HandlerMethod,
+        annotationType: Class<T>,
+        searchClassType: Boolean
+    ): T? {
+        return getAnnotation(handlerMethod.method, annotationType, searchClassType)
+    }
+
+    fun <T : Annotation> getMethodAnnotation(parameter: MethodParameter, annotationType: Class<T>): T? {
+        return this.getMethodAnnotation(parameter, annotationType, false)
+    }
+
+    fun <T : Annotation> getMethodAnnotation(
+        parameter: MethodParameter,
+        annotationType: Class<T>,
+        searchClassType: Boolean
+    ): T? {
+        val method = getBridgedMethod(parameter)
+        return getAnnotation(method, annotationType, searchClassType)
     }
 
     private fun isSupportedMethod(method: Method): Boolean {
