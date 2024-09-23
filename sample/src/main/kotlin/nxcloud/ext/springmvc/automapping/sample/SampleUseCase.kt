@@ -27,7 +27,10 @@ class SampleUseCase : AbstractUseCase<SampleUseCase.Input, SampleUseCase.Output>
     override fun doAction(input: Input): Output {
         logger.info { "aLong: ${input.aLong}, bString: ${input.bString}" }
 
-        return Output()
+        return Output(
+            a = input.aLong ?: 0,
+            b = input.bString ?: "",
+        )
     }
 
     @NoArgs
@@ -37,5 +40,8 @@ class SampleUseCase : AbstractUseCase<SampleUseCase.Input, SampleUseCase.Output>
         val bString: String?,
     ) : InputData()
 
-    class Output : OutputData()
+    class Output(
+        val a: Long,
+        val b: String,
+    ) : OutputData()
 }

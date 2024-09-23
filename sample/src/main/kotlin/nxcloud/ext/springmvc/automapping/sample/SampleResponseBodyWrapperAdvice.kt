@@ -18,7 +18,7 @@ class SampleResponseBodyWrapperAdvice(
     override fun supports(returnType: MethodParameter, converterType: Class<out HttpMessageConverter<*>>): Boolean {
         return returnType.method
             ?.let {
-                autoMappingRequestParameterTypeBinding.isSupportedMethod(it)
+                autoMappingRequestParameterTypeBinding.isSupported(returnType)
             }
             ?: false
     }

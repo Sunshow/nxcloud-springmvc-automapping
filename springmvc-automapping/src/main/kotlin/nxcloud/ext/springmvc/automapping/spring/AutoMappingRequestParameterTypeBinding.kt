@@ -137,7 +137,12 @@ open class AutoMappingRequestParameterTypeBinding {
         return annotation
     }
 
-    fun isSupportedMethod(method: Method): Boolean {
+    private fun isSupportedMethod(method: Method): Boolean {
+        return bindingCache[method] != null || originalBindingCache[method] != null
+    }
+
+    fun isSupported(parameter: MethodParameter): Boolean {
+        val method = getBridgedMethod(parameter)
         return bindingCache[method] != null || originalBindingCache[method] != null
     }
 
@@ -191,7 +196,7 @@ open class AutoMappingRequestParameterTypeBinding {
     }
 
     fun isSupportedPathVariable(parameter: MethodParameter, pattern: String): Boolean {
-        val method = parameter.method!!
+        val method = getBridgedMethod(parameter)
         if (!isSupportedMethod(method)) {
             return false
         }

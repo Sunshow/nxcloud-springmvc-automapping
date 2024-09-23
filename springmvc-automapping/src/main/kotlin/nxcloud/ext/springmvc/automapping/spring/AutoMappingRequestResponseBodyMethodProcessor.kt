@@ -19,11 +19,7 @@ class AutoMappingRequestResponseBodyMethodProcessor(
 
     override fun supportsReturnType(returnType: MethodParameter): Boolean {
         // 处理所有自动映射托管的方法
-        return returnType.method
-            ?.let {
-                autoMappingRequestParameterTypeBinding.isSupportedMethod(it)
-            }
-            ?: false
+        return autoMappingRequestParameterTypeBinding.isSupported(returnType)
     }
 
     override fun handleReturnValue(
