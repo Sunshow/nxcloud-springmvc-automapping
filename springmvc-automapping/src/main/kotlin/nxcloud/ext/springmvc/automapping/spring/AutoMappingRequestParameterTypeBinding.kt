@@ -107,7 +107,8 @@ open class AutoMappingRequestParameterTypeBinding {
     }
 
     // 调用此方法时需要确保此方法一定是已经自动注册了的, 即原始映射缓存中一定存在
-    fun resolveBinding(method: Method, parameter: MethodParameter): Class<*> {
+    fun resolveBinding(parameter: MethodParameter): Class<*> {
+        val method = getBridgedMethod(parameter)
         // 如果原始映射有, 而转换后的映射里也有, 则使用转换后对应位置的映射, 否则使用原始映射
         val originalParameterTypes = originalBindingCache[method]!!
         val parameterTypes = bindingCache[method]
@@ -140,8 +141,7 @@ open class AutoMappingRequestParameterTypeBinding {
         return bindingCache[method] != null || originalBindingCache[method] != null
     }
 
-    fun isSupportedParameterType(parameter: MethodParameter): Boolean {
-        // val method = parameter.method!!
+    private fun getBridgedMethod(parameter: MethodParameter): Method {
         // 兼容 springframework 6.1.9 之后的改动, 通过 this$0 获取 HandlerMethod, 直接获取 method 会得到抽象代理类的方法
         val handlerMethod = parameter::class.java
             .getDeclaredField("this$0")
@@ -149,7 +149,12 @@ open class AutoMappingRequestParameterTypeBinding {
                 trySetAccessible()
             }
             .get(parameter) as HandlerMethod
-        val method = handlerMethod.method
+        return handlerMethod.method
+    }
+
+    fun isSupportedParameterType(parameter: MethodParameter): Boolean {
+        // val method = parameter.method!!
+        val method = getBridgedMethod(parameter)
         if (!isSupportedMethod(method)) {
             return false
         }
@@ -161,7 +166,7 @@ open class AutoMappingRequestParameterTypeBinding {
             return true
         }
 
-        return resolveBinding(method, parameter)
+        return resolveBinding(parameter)
             .let {
                 !parameterType.isPrimitive
                         && !parameterType.canonicalName.startsWith("java.")
