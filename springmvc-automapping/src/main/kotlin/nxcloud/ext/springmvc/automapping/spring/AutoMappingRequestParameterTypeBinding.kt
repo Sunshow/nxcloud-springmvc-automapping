@@ -14,6 +14,7 @@ import org.springframework.ui.ModelMap
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo
 import java.lang.reflect.Method
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * 请求参数类型的绑定关系维护
@@ -26,17 +27,17 @@ open class AutoMappingRequestParameterTypeBinding {
     private var requestParameterTypeResolvers: List<AutoMappingRequestParameterTypeResolver>? = null
 
     // 原始的处理方法和对应方法参数之间的映射关系
-    private val originalBindingCache: MutableMap<Method, Array<Class<*>>> = mutableMapOf()
+    private val originalBindingCache: MutableMap<Method, Array<Class<*>>> = ConcurrentHashMap()
 
     // 经过处理转换之后的处理方法和对应方法参数之间的映射关系, 只保存了经过 AutoMappingRequestParameterTypeResolver 处理后的方法, 数据量少于原始映射 originalBindingCache
-    private val bindingCache: MutableMap<Method, Array<Class<*>>> = mutableMapOf()
+    private val bindingCache: MutableMap<Method, Array<Class<*>>> = ConcurrentHashMap()
 
     // 声明处类型缓存, 缓存声明接口或者Bean的类型, 便于后续找到原始的注解信息
-    private val declaringMethodCache: MutableMap<Method, Method> = mutableMapOf()
+    private val declaringMethodCache: MutableMap<Method, Method> = ConcurrentHashMap()
 
     // 缓存映射路径中包含的路径参数, 实现类似 Spring MVC 的 @PathVariable 的功能
     // Method 对应的 Map<String, Set<String>> 中的 String 为映射路径的 pattern, Set<String> 为 pattern 中包含的路径参数
-    private val pathVariableCache: MutableMap<Method, Map<String, Set<String>>> = mutableMapOf()
+    private val pathVariableCache: MutableMap<Method, Map<String, Set<String>>> = ConcurrentHashMap()
 
     /**
      * 注册绑定关系
@@ -88,7 +89,8 @@ open class AutoMappingRequestParameterTypeBinding {
     }
 
     private fun resolvePathParameters(method: Method, mapping: RequestMappingInfo): Map<String, Set<String>>? {
-        val regex = """\{(.*?)}""".toRegex()
+        // 支持带约束的路径变量, 如 {id:\d+} 提取变量名 id
+        val regex = """\{([^:}]+)(?::[^}]*)?}""".toRegex()
         val patterns = mapping.pathPatternsCondition?.patterns ?: return null
         return patterns
             .map {
