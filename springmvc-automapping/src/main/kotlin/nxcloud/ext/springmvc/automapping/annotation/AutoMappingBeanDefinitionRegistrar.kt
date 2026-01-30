@@ -178,7 +178,7 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar, Enviro
 
     private fun getBasePackages(
         importingClassMetadata: AnnotationMetadata,
-        attributes: Map<String, Any>
+        attributes: Map<String, Any?>
     ): Array<String> {
         @Suppress("UNCHECKED_CAST")
         val basePackages = attributes["basePackages"]!! as Array<String>
