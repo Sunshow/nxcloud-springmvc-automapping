@@ -4,9 +4,9 @@
 这是一个 Spring Boot 快速开发框架，通过 Contract 接口约定自动注册 Spring MVC 请求映射，省去手动定义 Controller 的过程。
 
 ## 技术栈
-- Kotlin 1.9.0
-- Spring Boot 3.3.4
-- Gradle 8.2.1
+- Kotlin 2.1.0
+- Spring Boot 3.5.10
+- Gradle 8.14
 - Java 17 (target)
 
 ## 项目结构
