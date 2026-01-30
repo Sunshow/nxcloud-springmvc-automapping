@@ -11,7 +11,10 @@ import org.springframework.core.MethodParameter
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.ui.Model
 import org.springframework.ui.ModelMap
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.context.request.ServletRequestAttributes
 import org.springframework.web.method.HandlerMethod
+import org.springframework.web.servlet.HandlerMapping
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo
 import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
@@ -174,14 +177,30 @@ open class AutoMappingRequestParameterTypeBinding {
     }
 
     private fun getBridgedMethod(parameter: MethodParameter): Method {
-        // 兼容 springframework 6.1.9 之后的改动, 通过 this$0 获取 HandlerMethod, 直接获取 method 会得到抽象代理类的方法
-        val handlerMethod = parameter::class.java
-            .getDeclaredField("this$0")
-            .apply {
-                trySetAccessible()
-            }
-            .get(parameter) as HandlerMethod
-        return handlerMethod.method
+        // 方案1: 从请求上下文获取 HandlerMethod (推荐, 使用 Spring 官方 API)
+        val requestAttributes = RequestContextHolder.getRequestAttributes() as? ServletRequestAttributes
+        val request = requestAttributes?.request
+        val handlerMethod = request?.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE) as? HandlerMethod
+
+        if (handlerMethod != null) {
+            return handlerMethod.method
+        }
+
+        logger.warn {
+            "Failed to get HandlerMethod from RequestContextHolder, falling back to reflection method"
+        }
+
+        // 方案2: 回退到原有的 this$0 反射 (兼容 springframework 6.1.9 之后的改动)
+        return try {
+            val field = parameter::class.java.getDeclaredField("this$0")
+            field.trySetAccessible()
+            val hm = field.get(parameter) as HandlerMethod
+            hm.method
+        } catch (e: Exception) {
+            // 方案3: 最终回退到 parameter.method
+            logger.warn { "Failed to get bridged method, falling back to parameter.method: ${e.message}" }
+            parameter.method!!
+        }
     }
 
     fun isSupportedParameterType(parameter: MethodParameter): Boolean {
