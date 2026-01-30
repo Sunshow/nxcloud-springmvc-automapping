@@ -1,6 +1,6 @@
 [versions]
 org-jetbrains-kotlin = "1.9.0"
-org-springframework-boot = "3.3.4"
+org-springframework-boot = "3.5.10"
 kotlin-logging-jvm = "5.0.1"
 nxcloud-foundation-core = "0.6.0"
 
