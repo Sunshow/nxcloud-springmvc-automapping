@@ -8,7 +8,7 @@ data class AutoMappingContractData(
     val declaringMethod: Method,
     // 映射路径
     val paths: Array<String>,
-    // 映射的HTTP请求方法
+    // 映射的HTTP请求方法, methods 声明会在扫描时展开为多条数据
     val method: AutoMappingContract.Method,
     // 响应处理的Bean类型
     val beanType: Class<*>,

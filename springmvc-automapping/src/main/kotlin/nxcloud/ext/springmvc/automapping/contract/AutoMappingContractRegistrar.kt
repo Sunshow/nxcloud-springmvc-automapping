@@ -52,20 +52,17 @@ open class AutoMappingContractRegistrar(
             }
             .map { data ->
                 val bean = applicationContext.getBean(data.beanType)
+                val beanMethod = bean.javaClass.methods
+                    .first {
+                        it.name == data.beanMethod
+                    }
+
                 AutoMappingRegistration(
                     data.declaringMethod,
-                    RequestMappingInfo
-                        .paths(*data.paths)
-                        .consumes(*data.consumes)
-                        .methods(*convertMethods(data))
-                        .options(options)
-                        .build(),
+                    createMapping(data, options),
                     data.beanType,
                     bean,
-                    bean.javaClass.methods
-                        .first {
-                            it.name == data.beanMethod
-                        }
+                    beanMethod,
                 )
             }
             .onEach { registration ->
@@ -82,10 +79,28 @@ open class AutoMappingContractRegistrar(
             }
     }
 
-    private fun convertMethods(data: AutoMappingContractData): Array<RequestMethod> {
-        return when (data.method) {
-            AutoMappingContract.Method.POST -> arrayOf(RequestMethod.POST)
-            AutoMappingContract.Method.GET -> arrayOf(RequestMethod.GET)
+    internal fun createMapping(
+        data: AutoMappingContractData,
+        options: RequestMappingInfo.BuilderConfiguration,
+    ): RequestMappingInfo {
+        return RequestMappingInfo
+            .paths(*data.paths)
+            .consumes(*data.consumes)
+            .methods(convertMethod(data.method))
+            .options(options)
+            .build()
+            .also { mapping ->
+                // GET 通常没有请求体, 不应因缺少 Content-Type 而无法匹配。
+                if (data.method == AutoMappingContract.Method.GET) {
+                    mapping.consumesCondition.isBodyRequired = false
+                }
+            }
+    }
+
+    private fun convertMethod(method: AutoMappingContract.Method): RequestMethod {
+        return when (method) {
+            AutoMappingContract.Method.POST -> RequestMethod.POST
+            AutoMappingContract.Method.GET -> RequestMethod.GET
         }
     }
 

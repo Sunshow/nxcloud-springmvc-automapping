@@ -86,7 +86,7 @@ class AutoMappingSampleApp
 
 ### 协议声明
 
-协议声明默认请求方式为 `POST`，默认接收的 `Content-Type` 为 `application/json`。
+协议声明默认请求方式为 `POST`，默认接收的 `Content-Type` 为 `application/json`。可以通过 `methods` 为同一个接口声明多个请求方式；当 `methods` 非空时，它优先于兼容保留的单值 `method`。GET 请求无请求体时不需要再额外声明 `consumes = []`。
 
 协议声明的方法为空方法即可，不需要任何参数和范围值，默认使用方法名作为映射路径，也可以在注解中自定义。
 
@@ -95,7 +95,10 @@ class AutoMappingSampleApp
 @AutoMappingContract(paths = ["/user"]) // 指定整个协议前缀
 interface UseCaseContract {
 
-    @AutoMappingContract(method = AutoMappingContract.Method.GET, beanType = UserService::class)
+    @AutoMappingContract(
+        methods = [AutoMappingContract.Method.GET, AutoMappingContract.Method.POST],
+        beanType = UserService::class,
+    )
     fun info()
 
     /**

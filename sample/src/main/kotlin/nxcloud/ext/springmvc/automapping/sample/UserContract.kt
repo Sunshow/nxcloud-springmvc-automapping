@@ -9,7 +9,10 @@ import org.springframework.stereotype.Component
 @AutoMappingContract(paths = ["/user"])
 interface UseCaseContract {
 
-    @AutoMappingContract(method = AutoMappingContract.Method.GET, beanType = UserService::class)
+    @AutoMappingContract(
+        methods = [AutoMappingContract.Method.GET, AutoMappingContract.Method.POST],
+        beanType = UserService::class,
+    )
     fun info()
 
     @AutoMappingContract(

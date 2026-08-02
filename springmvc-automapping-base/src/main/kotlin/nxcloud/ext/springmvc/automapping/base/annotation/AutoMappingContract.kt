@@ -20,6 +20,8 @@ annotation class AutoMappingContract(
     val consumes: Array<String> = ["application/json"],
     // OpenApi 接口名称
     val summary: String = "",
+    // 同时映射的HTTP请求方法, 非空时优先于 method
+    val methods: Array<Method> = [],
 ) {
     enum class Method {
         GET,

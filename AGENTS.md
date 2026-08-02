@@ -21,7 +21,7 @@ nxcloud-springmvc-automapping/
 ## 核心组件
 
 ### 注解 (springmvc-automapping-base)
-- `@AutoMappingContract` - 标记接口方法为自动映射端点
+- `@AutoMappingContract` - 标记接口方法为自动映射端点，`methods` 可同时声明多个 HTTP 方法
 - `@AutoMappingBean` - 标记 Bean 接口支持自动映射
 
 ### 核心类 (springmvc-automapping)
@@ -55,18 +55,22 @@ nxcloud-springmvc-automapping/
 ```
 支持带约束的路径变量如 `{id:\d+}`
 
+### HTTP 请求方法
+- `methods` 非空时优先于兼容保留的单值 `method`
+- 扫描时会将多个请求方法展开为独立映射，保持 `AutoMappingContractDataConverter` 兼容
+- 默认 `consumes` 仍为 `application/json`；无请求体的 GET 不需要声明 `consumes = []`
+
 ## Contract 使用示例
 ```kotlin
 @AutoMappingContract(paths = ["/user"])
 interface UserContract {
     @AutoMappingContract(
-        method = AutoMappingContract.Method.GET,
-        paths = ["/profile/{name}"],
+        methods = [AutoMappingContract.Method.GET, AutoMappingContract.Method.POST],
+        paths = ["/info"],
         beanType = UserService::class,
-        beanMethod = "create",
-        consumes = []
+        beanMethod = "info",
     )
-    fun testPath()
+    fun info()
 }
 ```
 

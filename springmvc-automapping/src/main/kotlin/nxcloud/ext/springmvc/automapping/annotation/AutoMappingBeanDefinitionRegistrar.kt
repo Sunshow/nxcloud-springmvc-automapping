@@ -98,7 +98,7 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar, Enviro
                             .map {
                                 it.asAnnotationAttributes()
                             }
-                        contractData.add(
+                        contractData.addAll(
                             annotationAttributesToContractData(
                                 metadata,
                                 typePaths,
@@ -127,13 +127,16 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar, Enviro
         }
     }
 
-    private fun annotationAttributesToContractData(
+    internal fun annotationAttributesToContractData(
         typeMetadata: AnnotationMetadata,
         typePaths: Array<String>,
         methodAttribute: AnnotationAttributes,
         methodName: String,
-    ): AutoMappingContractData {
+    ): List<AutoMappingContractData> {
         val method = methodAttribute.getEnum<AutoMappingContract.Method>("method")
+        @Suppress("UNCHECKED_CAST")
+        val methods = methodAttribute["methods"] as Array<AutoMappingContract.Method>
+        val effectiveMethods = methods.ifEmpty { arrayOf(method) }.distinct()
         val beanType = methodAttribute.getClass<Any>("beanType")
 
         // 默认使用同名方法查找
@@ -153,24 +156,28 @@ class AutoMappingBeanDefinitionRegistrar : ImportBeanDefinitionRegistrar, Enviro
         val summary = methodAttribute.getString("summary")
 
         // 合并映射路径
-        return typePaths
+        val resolvedPaths = typePaths
             .flatMap { prefix ->
                 paths
                     .map { path ->
                         "$prefix$path"
                     }
             }
-            .let {
+
+        val declaringMethod = Class.forName(typeMetadata.className).methods.first { m ->
+            // 找到声明处的方法
+            m.name == methodName
+        }
+
+        return effectiveMethods
+            .map { requestMethod ->
                 AutoMappingContractData(
-                    Class.forName(typeMetadata.className).methods.first { m ->
-                        // 找到声明处的方法
-                        m.name == methodName
-                    },
-                    it.toTypedArray(),
-                    method,
+                    declaringMethod,
+                    resolvedPaths.toTypedArray(),
+                    requestMethod,
                     beanType,
                     beanMethod,
-                    consumes,
+                    consumes.copyOf(),
                     summary,
                 )
             }
